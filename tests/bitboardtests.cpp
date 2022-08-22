@@ -48,11 +48,24 @@ void diagonal_moves_test() {
 	std::cout << "OK\n";
 }
 
+void bitscan_test() {
+	std::cout << "	bitscan test... ";
+
+	Bitboard bb = 0x0fde'eeed'1321'0100;
+	assert(bsf(bb) == 8);
+
+	bb = 0x0000'0010'efef'3212;
+	assert(bsr(bb) == 36);
+
+	std::cout << "OK\n";
+}
+
 void run_bitboard_tests() {
 	std::cout << "Running bitboard tests:\n";
 	set_get_test();
 	popcount_test();
 	move_test();
 	diagonal_moves_test();
+	bitscan_test();
 	std::cout << "Bitboard tests - OK\n\n";
 }

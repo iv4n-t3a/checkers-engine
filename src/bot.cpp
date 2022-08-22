@@ -12,7 +12,7 @@ void Bot::move() {
 
 inline float Bot::evalute() {
 	constexpr int king_cost = 8;
-	return ((bb_popcount(board.discsof[ side]) + king_cost*board.kingsset[ side].size()) -
-		    (bb_popcount(board.discsof[!side]) + king_cost*board.kingsset[!side].size())) /
-		bb_popcount(board.all);
+	return ((bb_popcount(board.get_discs(       side)) + bb_popcount(king_cost*board.get_kings(       side))) -
+		    (bb_popcount(board.get_discs((Side)!side)) + bb_popcount(king_cost*board.get_kings((Side)!side)))) /
+		bb_popcount(board.get_all());
 }

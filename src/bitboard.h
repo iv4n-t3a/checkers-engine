@@ -20,12 +20,39 @@ inline uint8_t bb_popcount(Bitboard bb) {
 	  return __builtin_popcountll(bb);
 }
 
-Bitboard rmove(Bitboard);
-Bitboard lmove(Bitboard);
-/* diagonal bitboard offsets */
-Bitboard ur(Bitboard); // up right
-Bitboard dr(Bitboard);
-Bitboard ul(Bitboard);
-Bitboard dl(Bitboard); // down left
+constexpr Bitboard rmove(Bitboard bb) {
+	return (bb & 0xfefe'fefe'fefe'fefe) >> 1;
+}
+constexpr Bitboard lmove(Bitboard bb) {
+	return (bb & 0x7f7f'7f7f'7f7f'7f7f) << 1;
+}
+
+constexpr Bitboard ur(Bitboard bb) { // up right
+	return rmove(bb) << 8;
+}
+constexpr Bitboard ul(Bitboard bb) {
+	return lmove(bb) << 8;
+}
+constexpr Bitboard dr(Bitboard bb) {
+	return rmove(bb) >> 8;
+}
+constexpr Bitboard dl(Bitboard bb) { // down left
+	return lmove(bb) >> 8;
+}
+
+
+Square bsf(Bitboard);
+Square bsr(Bitboard);
+
+class Bb_iterator {
+protected:
+	Bitboard bb;
+	Square processing;
+public:
+	Bb_iterator(Bitboard);
+	Square operator*() const;
+	void operator++();
+	bool not_ended() const;
+};
 
 #endif // ifndef BITBOARD
