@@ -8,9 +8,9 @@ class Bot {
 	Side side;
 public:
 	Bot(Board&, Side);
-	void move();
+	void make_move();
 private:
-	inline float evalute();
+	static inline float evalute(Board const&, Side);
 };
 
 #endif // #ifndef COMPUTER

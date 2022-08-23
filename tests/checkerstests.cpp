@@ -12,7 +12,7 @@ struct TestedBoard: public Board {
 	TestedBoard(): Board() {
 	}
 };
-
+/*
 struct Tester {
 	static void getset_test() {
 		std::cout << "	get, set test... ";
@@ -122,3 +122,4 @@ void run_checkers_tests() {
 	Tester::king_max_move_distanse_count_test();
 	std::cout << "checkers tests - OK\n";
 }
+*/

@@ -7,101 +7,115 @@
 
 constexpr Bitboard Board::upgradable[2];
 
-Board::Board() {
-	Board(
-		0x0000'0000'0055'aa55,
-		0x55aa'5500'0000'0000
-	);
-}
 Board::Board(Bitboard w, Bitboard b) {
 	all = w | b;
 	allof = {w, b};
 	discsof = {w, b};
+	kingsof = {0, 0};
 }
 
-Board::MoveState Board::move_state(Side p) const {
+Board::State Board::get_state(Side p) const {
 	if (king_moves_counter.is_draw())
-		return END_DRAW;
+		return DRAW;
 	if (repetition_history.is_draw())
-		return END_DRAW;
-	if (is_capture_possible(p))
-		return CAPTURE;
-	if (is_blocked(p))
-		return END_LOSE;
+		return DRAW;
+	if (is_blocked(p) and not is_capture_possible(p))
+		return (State) !p;
 
-	return NONCAPTURE;
+	return PLAYING;
+}
+bool Board::is_must_capture(Side p) const {
+	return is_capture_possible(p);
 }
 
-void Board::move_disc(Square s, Direction d, Side p) {
-	set_empty(s, p);
-	set_disc(s+d, p);
-	upgrade_if_nessary(s, p);
+void Board::move(Square from, Square to, Side p) {
+	if (is_disc(from, p))
+		move_disc(from, to, p);
+	else
+		move_king(from, to, p);
+}
+void Board::capture(Square from, Square to, Side p) {
+	if (is_disc(from, p))
+		capture_by_disc(from, to, p);
+	else
+		capture_by_king(from, to, p);
+}
+Bitboard Board::moves_at(Square s, Side p) const {
+	if (is_disc(s, p))
+		return disc_moves(s, p);
+	else
+		return king_moves(s, p);
+}
+Bitboard Board::captures_at(Square s, Side p) const {
+	if (is_disc(s, p))
+		return disc_captures(s, p);
+	else
+		return king_captures(s, p);
+}
+
+void Board::move_disc(Square from, Square to, Side p) {
+	set_empty(from, p);
+	set_disc(to, p);
+	upgrade_if_nessary(to, p);
 	pass_irreversible();
 }
-void Board::move_king(Square s, Direction d, int l, Side p) {
-	set_empty(s, p);
-	set_king(s + l*d, p);
+void Board::move_king(Square from, Square to, Side p) {
+	set_empty(from, p);
+	set_king(to, p);
 	pass_reversible();
 }
 
-void Board::capture_by_disc(Square s, Direction d, Side p) {
-	set_empty(s, p);
-	set_empty(s+d, p);
-	set_disc(s + 2*d, p);
-	upgrade_if_nessary(s, p);
-	king_moves_counter.drop();
+void Board::capture_by_disc(Square from, Square to, Side p) {
+	const Square captured = (from + to)/2;
+	set_empty(from, p);
+	set_empty(captured, (Side) !p);
+	set_disc(to, p);
+	upgrade_if_nessary(to, p);
 	pass_irreversible();
 }
-void Board::capture_by_king(Square s, Direction d, Side p) {
-	set_empty(s, p);
-	set_empty(s+d, p);
-	set_king(s + 2*d, p);
+void Board::capture_by_king(Square from, Square to, Side p) {
+	set_empty(from, p);
+	set_king(to, p);
+	for (int i = 0; i < 4; i++)
+		if (get_xray_blocker(from, i) == to) {
+			Bitboard c = ~cut_xray(from, i);
+			all &= c;
+			allof[!p] &= c;
+			discsof[!p] &= c;
+			kingsof[!p] &= c;
+		}
+
 	pass_irreversible();
 }
 
-bool Board::can_disc_capture(Square s, Side p) const {
-	for (Direction d: dirs)
-		if (can_disc_capture(s, d, p))
-			return true;
-	return false;
-}
-bool Board::can_king_capture(Square s, Side p) const {
-	for (Direction d: dirs)
-		if (can_king_capture(s, d, p))
-			return true;
-	return false;
-}
-bool Board::can_disc_capture(Square s, Direction d, Side p) const {
-	return allof[!p] & disc_attack[direction_to_num(d)][s] and
-		   ~all & disc_after_attack[direction_to_num(d)][s];
-}
-bool Board::can_king_capture(Square s, Direction d, Side p) const {
-	do {
-		if (can_disc_capture(s, d, p))
-			return true;
-		else if (getbit(all, s+d))
-			return false;
-		s += d;
-	} while (getbit(0x007e'7e7e'7e7e'7e00, s) and 0 <= s and s < 64);
-	return false;
-}
-
-bool Board::can_disc_move(Square s, Direction d) const {
-	return ~all & disc_attack[direction_to_num(d)][s];
-}
-int Board::max_king_move_distance(Square s, Direction d) const {
-	const int direction_num = direction_to_num(d);
-	const Bitboard xray = xrays[direction_num][s];
-	const Bitboard blockers = xray & all;
-	if (blockers == 0)
-		return bb_popcount(xray);
-
-	Square first_blocker;
-	if (is_bsr_direction[direction_num])
-		first_blocker = bsr(blockers);
+Bitboard Board::disc_moves(Square s, Side p) const {
+	if (p == WHITE)
+		return (ul(1ull << s) & ~all) | (ur(1ull << s) & ~all);
 	else
-		first_blocker = bsf(blockers);
-	return bb_popcount(xray ^ xrays[direction_num][first_blocker]) - 1;
+		return (dl(1ull << s) & ~all) | (dr(1ull << s) & ~all);
+}
+Bitboard Board::king_moves(Square s, Side p) const {
+	Bitboard r = 0;
+	for (int d_num = 0; d_num < 4; d_num++)
+		r |= cut_xray(s, d_num);
+	return r;
+}
+Bitboard Board::disc_captures(Square s, Side p) const {
+	Bitboard r = 0;
+		r |= ul(allof[!p] & ul(1ull << s)) & ~all;
+		r |= ur(allof[!p] & ur(1ull << s)) & ~all;
+		r |= dr(allof[!p] & dr(1ull << s)) & ~all;
+		r |= dl(allof[!p] & dl(1ull << s)) & ~all;
+	return r;
+}
+Bitboard Board::king_captures(Square s, Side p) const {
+	Bitboard r = 0;
+	for (int d_num = 0; d_num < 4; d_num++) {
+		Square blocker = get_xray_blocker(s, d_num);
+		if (blocker != NONE_SQUARE and side_at(blocker) != p)
+			r |= cut_xray(blocker, d_num);
+	}
+	return r;
 }
 
 Bitboard Board::get_all() const {
@@ -114,41 +128,48 @@ Bitboard Board::get_kings(Side p) const {
 	return discsof[p];
 }
 
-inline void Board::pass_reversible() {
-	repetition_history.push_reversible_move(kings_position_hash());
-	++king_moves_counter;
-}
-inline void Board::pass_irreversible() {
-	repetition_history.push_irreversible_move(kings_position_hash());
-	king_moves_counter.drop();
-}
-
 inline bool Board::is_capture_possible(Side p) const {
-	const Bitboard targets = allof[!p] & 0x007e'7e7e'7e7e'7e00;
+	bool r = 0;
+		r |= ul(allof[!p] & ul(discsof[p])) & ~all;
+		r |= ur(allof[!p] & ur(discsof[p])) & ~all;
+		r |= dr(allof[!p] & dr(discsof[p])) & ~all;
+		r |= dl(allof[!p] & dl(discsof[p])) & ~all;
 
-	bool r = ur(targets & ur(discsof[p])) & ~all;
-		r |= ul(targets & ul(discsof[p])) & ~all;
-		r |= dr(targets & dr(discsof[p])) & ~all;
-		r |= dl(targets & dl(discsof[p])) & ~all;
+	for (Bb_iterator i(kingsof[p]); i.not_ended(); ++i)
+		r |= king_captures(*i, p);
 
-	for (Bb_iterator i = Bb_iterator(kingsof[p]); i.not_ended(); ++i) {
-		r |= can_king_capture(*i, p);
-	}
 	return r;
 }
 inline bool Board::is_blocked(Side p) const {
 	if (p == WHITE)
 		return 
-		kingsof[p] == 0 and not (
+		not kingsof[p] and not (
 			(ur(discsof[p]) & ~all) or
 			(ul(discsof[p]) & ~all)
 		);
 	else
 		return 
-		kingsof[p] == 0 and not (
+		not kingsof[p] and not (
 			(dr(discsof[p]) & ~all) or
 			(dl(discsof[p]) & ~all)
 		);
+}
+
+inline Square Board::get_xray_blocker(Square s, int direction_num) const {
+	const Bitboard xray = xrays[direction_num][s];
+	const Bitboard blockers = xray & all;
+
+	if (blockers == 0)
+		return NONE_SQUARE;
+
+	if (is_bsr_direction[direction_num])
+		return bsr(blockers);
+	else
+		return bsf(blockers);
+}
+inline Bitboard Board::cut_xray(Square s, int d_num) const {
+	const Square blocker = get_xray_blocker(s, d_num);
+	return xrays[d_num][s] & ~xrays[d_num][blocker] & ~(1ull << blocker);
 }
 
 inline void Board::upgrade_if_nessary(Square s, Side p) {
@@ -159,11 +180,6 @@ inline void Board::upgrade(Square s, Side p) {
 	set_0(discsof[p], s);
 	set_1(kingsof[p], s);
 }
-
-KingsPositionHash Board::kings_position_hash() {
-	return (kingsof[WHITE] >> 1) | kingsof[BLACK];
-}
-
 
 void Board::set_disc(Square s, Side p) {
 	set_1(all, s);
@@ -181,10 +197,11 @@ void Board::set_empty(Square s, Side p) {
 	set_0(discsof[p], s);
 	set_0(kingsof[p], s);
 }
+
 bool Board::is_empty(Square s) const {
 	return not getbit(all, s);
 }
-bool Board::is_disk(Square s, Side p) const {
+bool Board::is_disc(Square s, Side p) const {
 	return getbit(discsof[p], s);
 }
 Side Board::side_at(Square s) const {
@@ -192,6 +209,20 @@ Side Board::side_at(Square s) const {
 		return WHITE;
 	return BLACK;
 }
+
+inline void Board::pass_reversible() {
+	repetition_history.push_reversible_move(kings_position_hash());
+	++king_moves_counter;
+}
+inline void Board::pass_irreversible() {
+	repetition_history.push_irreversible_move(kings_position_hash());
+	king_moves_counter.drop();
+}
+
+KingsPositionHash Board::kings_position_hash() {
+	return (kingsof[WHITE] >> 1) | kingsof[BLACK];
+}
+
 
 constexpr MovesCount KingMovesCounter::KING_MOVES_LIMIT;
 void KingMovesCounter::drop() {

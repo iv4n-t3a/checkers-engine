@@ -9,7 +9,7 @@ typedef uint64_t Bitboard;
 typedef uint64_t KingsPositionHash;
 typedef uint8_t Square;
 typedef int MovesCount;
-typedef std::array<Bitboard, 64> Map;
+typedef std::array<Bitboard, 65> Map;
 
 enum EnumSquare: Square {
 	A1, B1, C1, D1, E1, F1, G1, H1,
@@ -20,6 +20,7 @@ enum EnumSquare: Square {
 	A6, B6, C6, D6, E6, F6, G6, H6,
 	A7, B7, C7, D7, E7, F7, G7, H7,
 	A8, B8, C8, D8, E8, F8, G8, H8,
+	NONE_SQUARE = 64
 };
 
 enum Side : bool {
@@ -33,14 +34,12 @@ enum Direction : int8_t {
 	SOUTH_EAST = -NORTH_WEST,
 	SOUTH_WEST = -NORTH_EAST
 };
-constexpr std::array<Direction, 4> dirs = {NORTH_EAST, NORTH_WEST, SOUTH_WEST, SOUTH_EAST};
+constexpr std::array<Direction, 4> dirs = {NORTH_EAST, NORTH_WEST, SOUTH_EAST, SOUTH_WEST};
+
+constexpr std::array<std::array<Direction, 2>, 2> up_dirs = 
+	/* WHITE */              /* BLACK */
+	{NORTH_EAST, NORTH_WEST, SOUTH_WEST, SOUTH_EAST};
 constexpr std::array<bool, 4> is_bsr_direction = {true, true, false, false};
-constexpr std::array<Bitboard, 4> direction_limits = {
-	0x0101'0101'0101'0101, // NORTH_EAST
-	0x8080'8080'8080'8080, // NORTH_WEST
-	0x0101'0101'0101'0101, // SOUTH_EAST
-	0x8080'8080'8080'8080, // NORTH_EAST
-};
 
 constexpr uint8_t direction_to_num(Direction d) {
 	switch(d) {
@@ -49,9 +48,7 @@ constexpr uint8_t direction_to_num(Direction d) {
 		case SOUTH_EAST: return 2;
 		case SOUTH_WEST: return 3;
 	}
-}
-constexpr Bitboard limit_of(Direction d) {
-	return direction_limits[direction_to_num(d)];
+	return -1;
 }
 
 

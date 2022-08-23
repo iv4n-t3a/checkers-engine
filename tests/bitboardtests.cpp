@@ -3,7 +3,7 @@
 #include <assert.h>
 
 void set_get_test() {
-	std::cout << "	set test... ";
+	std::cout << "	get, set test... ";
 
 	Bitboard bb = 0;
 	

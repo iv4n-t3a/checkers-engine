@@ -30,11 +30,10 @@ Bb_iterator::Bb_iterator(Bitboard b) {
 	bb = b;
 }
 void Bb_iterator::operator++() {
-	set_0(bb, processing);
-	processing = bsf(bb);
+	set_0(bb, bsf(bb));
 }
 Square Bb_iterator::operator*() const {
-	return processing;
+	return bsf(bb);
 }
 bool Bb_iterator::not_ended() const {
 	return bb != 0;
