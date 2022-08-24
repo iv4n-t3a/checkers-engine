@@ -1,6 +1,6 @@
 CXX := g++
 CPPFLAGS := -g -Wall -std=c++20
-LIBS :=  -lsfml-graphics -lsfml-window -lsfml-system
+LIBS :=  -lsfml-graphics -lsfml-window -lsfml-system -pthread
 LDFLAGS := $(LIBS)
 SRCEXT := cpp
 HEADEREXT := h

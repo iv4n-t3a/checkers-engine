@@ -27,7 +27,9 @@ void Drawer::redraw() {
 
 		if (is_bordered(s))
 			draw_border(s);
+	}
 
+	for (Square s = 0; s < 64; s++) {
 		if (board.is_empty(s))
 			continue;
 
@@ -36,9 +38,6 @@ void Drawer::redraw() {
 			draw_disc(s, p);
 		else
 			draw_king(s, p);
-
-		if (text != "")
-			draw_text(text);
 	}	
 	window.display();
 }
@@ -67,6 +66,10 @@ void Drawer::set_text(std::string t) {
 }
 
 void Drawer::border(Square s) {
+	if (s == NONE_SQUARE) {
+		unborder_all();
+		return;
+	}
 	set_1(bordered, s);
 }
 void Drawer::border(Bitboard bb) {
@@ -93,6 +96,8 @@ void Drawer::draw_text(std::string t) {
 void Drawer::draw_disc(Square s, Side p) {
 	sf::CircleShape disc(square_size / 2);
 	disc.setFillColor(get_piece_color(p));
+	disc.setOutlineThickness(1.5);
+	disc.setOutlineColor(get_piece_outline_color(p));
 	draw_shape(s, &disc);
 }
 void Drawer::draw_king(Square s, Side p) {
@@ -104,7 +109,7 @@ void Drawer::draw_king(Square s, Side p) {
 	draw_shape(s, &king_centre);
 }
 void Drawer::draw_border(Square s) {
-	fill_square(s, config::BORDER_COLOR);
+	fill_square(s, config::INBORDER_COLOR);
 }
 void Drawer::draw_white(Square s) {
 	fill_square(s, config::WHITE_SQUARE_COLOR);
@@ -121,6 +126,9 @@ inline void Drawer::draw_shape(Square s, sf::Shape* shape) {
 	s = 63 - s;
 	shape->setPosition(s%8 * square_size, s/8 * square_size);
 	window.draw(*shape);
+}
+inline sf::Color Drawer::get_piece_outline_color(Side s) {
+	return s == WHITE ? config::WHITE_PIECES_OUTLINE_COLOR: config::BLACK_PIECES_OUTLINE_COLOR;
 }
 inline sf::Color Drawer::get_piece_color(Side s) {
 	return s == WHITE ? config::WHITE_PIECES_COLOR: config::BLACK_PIECES_COLOR;

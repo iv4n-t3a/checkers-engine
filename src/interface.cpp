@@ -1,3 +1,5 @@
+#include <thread>
+
 #include "types.h"
 #include "checkers.h"
 #include "bot.h"
@@ -17,8 +19,17 @@ void Interface::run() {
 		drawer.redraw();
 
 		display_state(config::COMPUTER);
-		bot.make_move();
+		computer_move();
 	}
+}
+void Interface::computer_move() {
+	std::thread t([this] () {
+		for (;;) {
+			pick_square();
+		}
+	});
+	bot.make_move();
+	t.detach();
 }
 void Interface::pick_piece_and_move(bool must_capture) {
 	Square s = pick_square();
