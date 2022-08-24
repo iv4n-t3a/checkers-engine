@@ -11,7 +11,7 @@
 Interface::Interface(Board& b, Bot& c, Drawer& d): board(b), bot(c), drawer(d) {
 }
 void Interface::run() {
-	while (true) {
+	for (;;) {
 		display_state(config::PLAYER);
 		pick_piece_and_move(board.is_must_capture(config::PLAYER));
 		drawer.redraw();
@@ -28,23 +28,19 @@ void Interface::pick_piece_and_move(bool must_capture) {
 	}
 	try_move(s, must_capture);
 }
-inline void Interface::try_move(Square s, bool must_capture) {
+void Interface::try_move(Square s, bool must_capture) {
 	Bitboard moves;
 	if (must_capture)
 		moves = board.captures_at(s, config::PLAYER);
 	else
 		moves = board.moves_at(s, config::PLAYER);
 
-	drawer.unborder_all();
-	drawer.border(moves);
-	Square choice = pick_square();
+	Square choice = pick_move(moves);
 
 	if (getbit(moves, choice)) {
-		if (must_capture) {
-			board.capture(s, choice, config::PLAYER);
-			if (board.captures_at(choice, config::PLAYER))
-				finish_capture(choice);
-		} else
+		if (must_capture)
+			make_capture(s, choice);
+		else
 			board.move(s, choice, config::PLAYER);
 	} else {
 		if (is_movable(choice))
@@ -53,28 +49,28 @@ inline void Interface::try_move(Square s, bool must_capture) {
 			pick_piece_and_move(must_capture);
 	}
 }
+inline void Interface::make_capture(Square from, Square to) {
+	board.capture(from, to, config::PLAYER);
+	if (board.captures_at(to, config::PLAYER))
+		finish_capture(to);
+}
 void Interface::finish_capture(Square s) {
 	for (;;) {
 		Square choice;
 		do {
 			choice = pick_square();
-
 		} while (choice != s);
+
 		Bitboard moves = board.captures_at(s, config::PLAYER);
-		drawer.unborder_all();
-		drawer.border(moves);
-		choice = pick_square();
-		if (getbit(moves, choice)) {
-			board.capture(s, choice, config::PLAYER);
-			if (board.captures_at(choice, config::PLAYER))
-				finish_capture(choice);
-			else
-				return;
-		}
+		choice = pick_move(moves);
+		if (getbit(moves, choice))
+			make_capture(s, choice);
 	}
 }
-inline bool Interface::is_movable(Square s) const {
-	return not (s == NONE_SQUARE or board.is_empty(s) or board.side_at(s) != config::PLAYER);
+Square Interface::pick_move(Bitboard moves) {
+	drawer.border(moves);
+	Square choice = pick_square();
+	return choice;
 }
 inline Square Interface::pick_square() {
 	Square choice = NONE_SQUARE;
@@ -83,6 +79,9 @@ inline Square Interface::pick_square() {
 	drawer.unborder_all();
 	drawer.border(choice);
 	return choice;
+}
+inline bool Interface::is_movable(Square s) const {
+	return not (s == NONE_SQUARE or board.is_empty(s) or board.side_at(s) != config::PLAYER);
 }
 
 inline void Interface::display_state(Side p) {

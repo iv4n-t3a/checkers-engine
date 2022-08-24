@@ -16,8 +16,10 @@ public:
 	void run();
 private:
 	void pick_piece_and_move(bool must_capture);
-	inline void try_move(Square, bool must_capture);
+	void try_move(Square, bool must_capture);
+	inline void make_capture(Square, Square);
 	void finish_capture(Square);
+	inline Square pick_move(Bitboard moves);
 	inline bool is_movable(Square) const;
 	inline Square pick_square();
 
