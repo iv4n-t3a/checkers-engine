@@ -15,8 +15,10 @@ public:
 	Interface(Board&, Bot&, Drawer&);
 	void run();
 private:
-	inline void pick_piece_and_move(bool must_capture);
-
+	void pick_piece_and_move(bool must_capture);
+	inline void try_move(Square, bool must_capture);
+	void finish_capture(Square);
+	inline bool is_movable(Square) const;
 	inline Square pick_square();
 
 	inline void display_state(Side);

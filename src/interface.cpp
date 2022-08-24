@@ -14,34 +14,68 @@ void Interface::run() {
 	while (true) {
 		display_state(config::PLAYER);
 		pick_piece_and_move(board.is_must_capture(config::PLAYER));
+		config::PLAYER = (Side) !config::PLAYER;
 		
-		display_state(config::COMPUTER);
-		bot.make_move();
+		//display_state(config::COMPUTER);
+		//bot.make_move();
 	}
 }
-inline void Interface::pick_piece_and_move(bool must_capture) {
+void Interface::pick_piece_and_move(bool must_capture) {
 	Square s = pick_square();
-	if (s == NONE_SQUARE or board.is_empty(s) or board.side_at(s) != config::PLAYER)
+	if (not is_movable(s)) {
 		pick_piece_and_move(must_capture);
-
+		return;
+	}
+	try_move(s, must_capture);
+}
+inline void Interface::try_move(Square s, bool must_capture) {
 	Bitboard moves;
 	if (must_capture)
 		moves = board.captures_at(s, config::PLAYER);
 	else
 		moves = board.moves_at(s, config::PLAYER);
 
+	drawer.unborder_all();
 	drawer.border(moves);
 	Square choice = pick_square();
 
 	if (getbit(moves, choice)) {
-		if (must_capture)
+		if (must_capture) {
 			board.capture(s, choice, config::PLAYER);
-		else
+			if (board.captures_at(choice, config::PLAYER))
+				finish_capture(choice);
+		} else
 			board.move(s, choice, config::PLAYER);
-	} else
-		pick_piece_and_move(must_capture);
+	} else {
+		if (is_movable(choice))
+			try_move(choice, must_capture);
+		else
+			pick_piece_and_move(must_capture);
+	}
 }
+void Interface::finish_capture(Square s) {
+	for (;;) {
+		Square choice;
+		do {
+			choice = pick_square();
 
+		} while (choice != s);
+		Bitboard moves = board.captures_at(s, config::PLAYER);
+		drawer.unborder_all();
+		drawer.border(moves);
+		choice = pick_square();
+		if (getbit(moves, choice)) {
+			board.capture(s, choice, config::PLAYER);
+			if (board.captures_at(choice, config::PLAYER))
+				finish_capture(choice);
+			else
+				return;
+		}
+	}
+}
+inline bool Interface::is_movable(Square s) const {
+	return not (s == NONE_SQUARE or board.is_empty(s) or board.side_at(s) != config::PLAYER);
+}
 inline Square Interface::pick_square() {
 	Square choice = NONE_SQUARE;
 	while (choice == NONE_SQUARE)
