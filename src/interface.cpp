@@ -14,10 +14,10 @@ void Interface::run() {
 	while (true) {
 		display_state(config::PLAYER);
 		pick_piece_and_move(board.is_must_capture(config::PLAYER));
-		config::PLAYER = (Side) !config::PLAYER;
-		
-		//display_state(config::COMPUTER);
-		//bot.make_move();
+		drawer.redraw();
+
+		display_state(config::COMPUTER);
+		bot.make_move();
 	}
 }
 void Interface::pick_piece_and_move(bool must_capture) {

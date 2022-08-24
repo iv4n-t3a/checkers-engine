@@ -72,6 +72,7 @@ public:
 	Bitboard king_captures(Square, Side) const;
 
 	Bitboard get_all() const;
+	Bitboard get_all(Side) const;
 	Bitboard get_discs(Side) const;
 	Bitboard get_kings(Side) const;
 

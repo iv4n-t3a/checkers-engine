@@ -10,8 +10,8 @@
 int main(int argc, char *argv[]) {
 	sf::RenderWindow window;
 	window.create(sf::VideoMode(800, 600), "checkers");
-	//Board b;
-	Board b(0x0088'0000'0000'0000, 0x0400);
+	Board b;
+	//Board b(0x0088'0000'0000'0000, 0x0400);
 	Bot c(b, config::COMPUTER);
 	Drawer d(window, b);
 	Interface i(b, c, d);

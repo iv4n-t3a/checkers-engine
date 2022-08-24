@@ -121,6 +121,9 @@ Bitboard Board::king_captures(Square s, Side p) const {
 Bitboard Board::get_all() const {
 	return all;
 }
+Bitboard Board::get_all(Side p) const {
+	return allof[p];
+}
 Bitboard Board::get_discs(Side p) const {
 	return discsof[p];
 }
