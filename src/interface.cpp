@@ -1,4 +1,4 @@
-#include <thread>
+#include <SFML/System.hpp>
 
 #include "types.h"
 #include "checkers.h"
@@ -22,14 +22,18 @@ void Interface::run() {
 		computer_move();
 	}
 }
+
+sf::Mutex m;
 void Interface::computer_move() {
-	std::thread t([this] () {
+	sf::Thread t([this] () {
 		for (;;) {
+			m.lock();
 			pick_square();
+			m.unlock();
 		}
 	});
 	bot.make_move();
-	t.detach();
+	t.terminate();
 }
 void Interface::pick_piece_and_move(bool must_capture) {
 	Square s = pick_square();
