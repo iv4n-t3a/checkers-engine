@@ -95,16 +95,16 @@ void Drawer::draw_text(std::string t) {
 }
 void Drawer::draw_disc(Square s, Side p) {
 	sf::CircleShape disc(square_size / 2);
-	disc.setFillColor(get_piece_color(p));
+	disc.setFillColor(config::PIECE_COLOR[p]);
 	disc.setOutlineThickness(1.5);
-	disc.setOutlineColor(get_piece_outline_color(p));
+	disc.setOutlineColor(config::PIECE_OUTLINE_COLOR[p]);
 	draw_shape(s, &disc);
 }
 void Drawer::draw_king(Square s, Side p) {
 	sf::CircleShape king(square_size / 2);
 	king.setOutlineThickness(1.5);
-	king.setOutlineColor(get_piece_outline_color(p));
-	const sf::Texture* texture = get_king_texture(p);
+	king.setOutlineColor(config::PIECE_OUTLINE_COLOR[p]);
+	const sf::Texture* texture = &config::KING_TEXTURE[p];
 	king.setTexture(texture);
 	draw_shape(s, &king);
 }
@@ -112,10 +112,10 @@ void Drawer::draw_border(Square s) {
 	fill_square(s, config::INBORDER_COLOR);
 }
 void Drawer::draw_white(Square s) {
-	fill_square(s, config::WHITE_SQUARE_COLOR);
+	fill_square(s, config::SQUARE_COLOR[WHITE]);
 }
 void Drawer::draw_black(Square s) {
-	fill_square(s, config::BLACK_SQUARE_COLOR);
+	fill_square(s, config::SQUARE_COLOR[BLACK]);
 }
 inline void Drawer::fill_square(Square s, sf::Color c) {
 	sf::RectangleShape r(sf::Vector2f(square_size, square_size));
@@ -126,17 +126,4 @@ inline void Drawer::draw_shape(Square s, sf::Shape* shape) {
 	s = 63 - s;
 	shape->setPosition(s%8 * square_size, s/8 * square_size);
 	window.draw(*shape);
-}
-
-inline sf::Color Drawer::get_piece_outline_color(Side s) {
-	return s == WHITE ? config::WHITE_PIECES_OUTLINE_COLOR: config::BLACK_PIECES_OUTLINE_COLOR;
-}
-inline sf::Color Drawer::get_piece_color(Side s) {
-	return s == WHITE ? config::WHITE_PIECES_COLOR: config::BLACK_PIECES_COLOR;
-}
-inline sf::Color Drawer::get_square_color(Side s) {
-	return s == WHITE ? config::WHITE_SQUARE_COLOR: config::BLACK_SQUARE_COLOR;
-}
-inline const sf::Texture* Drawer::get_king_texture(Side s) {
-	return s == WHITE ? &config::WHITE_KING_TEXTURE: &config::BLACK_KING_TEXTURE;
 }

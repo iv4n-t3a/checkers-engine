@@ -1,4 +1,5 @@
 #include <SFML/System.hpp>
+#include <string>
 
 #include "types.h"
 #include "checkers.h"
@@ -103,35 +104,24 @@ inline bool Interface::is_movable(Square s) const {
 
 inline void Interface::display_state(Side p) {
 	switch (board.get_state(p)) {
-		case Board::WHITE_WIN: display_win_of(WHITE); break;
-		case Board::BLACK_WIN: display_win_of(BLACK); break;
+		case Board::WHITE_WIN: display_win_of_white(); break;
+		case Board::BLACK_WIN: display_win_of_black(); break;
 		case Board::DRAW: display_draw(); break;
 		case Board::PLAYING: return;
-		default: return;
 	}
 }
 
-inline void Interface::display_win_of(Side p) {
-	if (p == config::PLAYER)
-		display_win();
-	else
-		display_lose();
+inline void Interface::display_win_of_white() {
+	display_text("White win!");
 }
-
-inline void Interface::display_lose() {
-	std::cout << "You lose!\n";
-	exit(0);
+inline void Interface::display_win_of_black() {
+	display_text("Black win!");
 }
 inline void Interface::display_draw() {
-	std::cout << "Draw!\n";
-	exit(0);
-}
-inline void Interface::display_win() {
-	std::cout << "You win!\n";
-	exit(0);
+	display_text("Draw!");
 }
 
-inline void Interface::wait_untill_close() {
-	for (;;)
-		pick_square();
+inline void Interface::display_text(std::string text) {
+	std::cout << text << std::endl;
+	exit(0);
 }

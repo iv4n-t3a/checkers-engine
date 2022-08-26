@@ -1,6 +1,8 @@
 #ifndef INTERFACE
 #define INTERFACE
 
+#include <string>
+
 #include "types.h"
 #include "checkers.h"
 #include "bot.h"
@@ -26,11 +28,12 @@ private:
 	inline Square pick_square();
 
 	inline void display_state(Side);
-	inline void display_win_of(Side);
-	inline void display_lose();
+
+	inline void display_win_of_white();
+	inline void display_win_of_black();
 	inline void display_draw();
-	inline void display_win();
-	inline void wait_untill_close();
+
+	inline void display_text(std::string);
 };
 
 #endif
