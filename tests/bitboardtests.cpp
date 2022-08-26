@@ -60,6 +60,19 @@ void bitscan_test() {
 	std::cout << "OK\n";
 }
 
+void iterator_test() {
+	std::cout << "	iterator test... ";
+	Bitboard bb = 0x0101'0101'0101'0101;
+	int count = 0;
+
+	for (Bb_iterator i(bb); i.not_ended(); ++i) {
+		assert(getbit(bb, *i));
+		count++;
+	}
+	assert(count == 8);
+	std::cout << "OK\n";
+}
+
 void run_bitboard_tests() {
 	std::cout << "Running bitboard tests:\n";
 	set_get_test();
@@ -67,5 +80,6 @@ void run_bitboard_tests() {
 	move_test();
 	diagonal_moves_test();
 	bitscan_test();
+	iterator_test();
 	std::cout << "Bitboard tests - OK\n\n";
 }

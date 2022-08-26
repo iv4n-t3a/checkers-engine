@@ -23,23 +23,19 @@ enum EnumSquare: Square {
 	NONE_SQUARE = 64
 };
 
-enum Side : bool {
+enum Side {
 	WHITE = 0, 
 	BLACK = 1
 };
 
-enum Direction : int8_t {
+enum Direction {
 	NORTH_EAST = 9,
 	NORTH_WEST = 7,
 	SOUTH_EAST = -NORTH_WEST,
 	SOUTH_WEST = -NORTH_EAST
 };
 constexpr std::array<Direction, 4> dirs = {NORTH_EAST, NORTH_WEST, SOUTH_EAST, SOUTH_WEST};
-
-constexpr std::array<std::array<Direction, 2>, 2> up_dirs = 
-	/* WHITE */              /* BLACK */
-	{NORTH_EAST, NORTH_WEST, SOUTH_WEST, SOUTH_EAST};
-constexpr std::array<bool, 4> is_bsr_direction = {true, true, false, false};
+constexpr std::array<bool, 4> is_bsf_direction = {true, true, false, false};
 
 constexpr uint8_t direction_to_num(Direction d) {
 	switch(d) {

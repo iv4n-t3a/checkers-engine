@@ -5,7 +5,6 @@
 #include "checkers.h"
 
 
-constexpr Bitboard Board::upgradable[2];
 
 Board::Board(Bitboard w, Bitboard b) {
 	all = w | b;
@@ -74,16 +73,13 @@ void Board::capture_by_disc(Square from, Square to, Side p) {
 	pass_irreversible();
 }
 void Board::capture_by_king(Square from, Square to, Side p) {
+	const int steps_count = abs(to%8 - from%8);
+	const Direction d = (Direction)((to - from) / steps_count);
+	const Square captured = get_xray_blocker(from, direction_to_num(d));
+
 	set_empty(from, p);
+	set_empty(captured, (Side) !p);
 	set_king(to, p);
-	for (int i = 0; i < 4; i++)
-		if (get_xray_blocker(from, i) == to) {
-			Bitboard c = ~cut_xray(from, i);
-			all &= c;
-			allof[!p] &= c;
-			discsof[!p] &= c;
-			kingsof[!p] &= c;
-		}
 
 	pass_irreversible();
 }
@@ -128,7 +124,7 @@ Bitboard Board::get_discs(Side p) const {
 	return discsof[p];
 }
 Bitboard Board::get_kings(Side p) const {
-	return discsof[p];
+	return kingsof[p];
 }
 
 inline bool Board::is_capture_possible(Side p) const {
@@ -137,7 +133,7 @@ inline bool Board::is_capture_possible(Side p) const {
 		r |= ur(allof[!p] & ur(discsof[p])) & ~all;
 		r |= dr(allof[!p] & dr(discsof[p])) & ~all;
 		r |= dl(allof[!p] & dl(discsof[p])) & ~all;
-
+	
 	for (Bb_iterator i(kingsof[p]); i.not_ended(); ++i)
 		r |= king_captures(*i, p);
 
@@ -145,17 +141,15 @@ inline bool Board::is_capture_possible(Side p) const {
 }
 inline bool Board::is_blocked(Side p) const {
 	if (p == WHITE)
-		return 
-		not kingsof[p] and not (
-			(ur(discsof[p]) & ~all) or
-			(ul(discsof[p]) & ~all)
-		);
+		return
+		not kingsof[p] and
+		not (ur(discsof[p]) & ~all) and
+		not (ul(discsof[p]) & ~all);
 	else
 		return 
-		not kingsof[p] and not (
-			(dr(discsof[p]) & ~all) or
-			(dl(discsof[p]) & ~all)
-		);
+		not kingsof[p] and
+		not (dr(discsof[p]) & ~all) and
+		not (dl(discsof[p]) & ~all);
 }
 
 inline Square Board::get_xray_blocker(Square s, int direction_num) const {
@@ -165,10 +159,7 @@ inline Square Board::get_xray_blocker(Square s, int direction_num) const {
 	if (blockers == 0)
 		return NONE_SQUARE;
 
-	if (is_bsr_direction[direction_num])
-		return bsr(blockers);
-	else
-		return bsf(blockers);
+	return is_bsf_direction[direction_num] ? bsf(blockers): bsr(blockers);
 }
 inline Bitboard Board::cut_xray(Square s, int d_num) const {
 	const Square blocker = get_xray_blocker(s, d_num);
@@ -227,7 +218,6 @@ KingsPositionHash Board::kings_position_hash() {
 }
 
 
-constexpr MovesCount KingMovesCounter::KING_MOVES_LIMIT;
 void KingMovesCounter::drop() {
 	king_moves_count = 0;
 }
@@ -238,7 +228,6 @@ bool KingMovesCounter::is_draw() const {
 	return king_moves_count >= KING_MOVES_LIMIT;
 }
 
-constexpr MovesCount RepetitionHistory::REPETITION_LIMIT;
 void RepetitionHistory::push_reversible_move(KingsPositionHash h) {
 	repetition_history.push_back(h);
 }

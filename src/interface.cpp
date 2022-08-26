@@ -14,25 +14,25 @@ Interface::Interface(Board& b, Bot& c, Drawer& d): board(b), bot(c), drawer(d) {
 }
 void Interface::run() {
 	for (;;) {
-		display_state(config::PLAYER);
-		pick_piece_and_move(board.is_must_capture(config::PLAYER));
 		drawer.redraw();
-
+		/*
 		display_state(config::COMPUTER);
 		computer_move();
+		config::COMPUTER = (Side)!config::COMPUTER;
+		*/
+		display_state(config::PLAYER);
+		pick_piece_and_move(board.is_must_capture(config::PLAYER));
+		config::PLAYER = (Side)!config::PLAYER;
 	}
 }
 
-sf::Mutex m;
 void Interface::computer_move() {
 	sf::Thread t([this] () {
 		for (;;) {
-			m.lock();
-			pick_square();
-			m.unlock();
+			drawer.wait_mouse_click();
 		}
 	});
-	bot.make_move();
+	bot.make_move(config::COMPUTER);
 	t.terminate();
 }
 void Interface::pick_piece_and_move(bool must_capture) {
@@ -70,16 +70,18 @@ inline void Interface::make_capture(Square from, Square to) {
 		finish_capture(to);
 }
 void Interface::finish_capture(Square s) {
-	for (;;) {
-		Square choice;
-		do {
-			choice = pick_square();
-		} while (choice != s);
+	std::cout << s << std::endl;
 
-		Bitboard moves = board.captures_at(s, config::PLAYER);
-		choice = pick_move(moves);
-		if (getbit(moves, choice))
-			make_capture(s, choice);
+	Bitboard moves = board.captures_at(s, config::PLAYER);
+	Square choice = pick_move(moves);
+	if (getbit(moves, choice)) {
+		make_capture(s, choice);
+		return;
+	} else {
+		do
+			choice = pick_square();
+		while (choice != s);
+		finish_capture(s);
 	}
 }
 Square Interface::pick_move(Bitboard moves) {

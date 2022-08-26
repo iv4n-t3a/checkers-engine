@@ -32,7 +32,7 @@ public:
 
 class Board {
 public:
-	enum State : uint8_t {
+	enum State {
 		WHITE_WIN = WHITE,
 		BLACK_WIN = BLACK,
 		DRAW,
@@ -41,7 +41,7 @@ public:
 protected:
 	Bitboard all = 0;
 	std::array<Bitboard, 2> allof, discsof, kingsof;
-	static constexpr Bitboard upgradable[2] = {
+	static constexpr std::array<Bitboard, 2> upgradable = {
 		0xff00'0000'0000'0000, // WHITE
 		0x0000'0000'0000'00ff  // BLACK
 	};

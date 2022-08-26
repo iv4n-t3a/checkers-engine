@@ -11,20 +11,21 @@ typedef float Evaluation;
 
 class Bot {
 	Board& board;
-	Side side;
-	static constexpr std::array<Evaluation, 2> best = {1, -1};
-	static constexpr std::array<Evaluation, 2> worst = {-1, 1};
+	static constexpr std::array<Evaluation, 2> best = {
+		std::numeric_limits<Evaluation>::max(),
+		std::numeric_limits<Evaluation>::min()
+	};
+	static constexpr std::array<Evaluation, 2> worst = {best[BLACK], best[WHITE]};
 public:
-	Bot(Board&, Side);
-	void make_move();
+	Bot(Board&);
+	void make_move(Side);
 private:
 	static std::pair<Board, Evaluation> minmax_search(Board const&, Side, int depth);
 	static std::vector<Board> generate_moves(Board const&, Side);
+	static void generate_captures(Board const&, Square, Side, std::vector<Board>&);
 	static inline Evaluation evaluate(Board const&);
-
-	static inline Evaluation best_rating(Evaluation, Evaluation, Side);
-	static inline Board max(Board const&, Board const&);
-	static inline Board min(Board const&, Board const&);
+	static inline std::pair<Board, Evaluation> best_position(
+		std::pair<Board, Evaluation> const&, std::pair<Board, Evaluation> const&, Side);
 };
 
 #endif // #ifndef BOT
