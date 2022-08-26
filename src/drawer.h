@@ -45,6 +45,7 @@ private:
 	static inline sf::Color get_piece_outline_color(Side);
 	static inline sf::Color get_piece_color(Side);
 	static inline sf::Color get_square_color(Side);
+	static inline const sf::Texture* get_king_texture(Side);
 };
 
 #endif // #ifndef GUI

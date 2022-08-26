@@ -102,11 +102,11 @@ void Drawer::draw_disc(Square s, Side p) {
 }
 void Drawer::draw_king(Square s, Side p) {
 	sf::CircleShape king(square_size / 2);
-	sf::CircleShape king_centre(square_size / 3);
-	king.setFillColor(get_piece_color(p));
-	king_centre.setFillColor(get_square_color(p));
+	king.setOutlineThickness(1.5);
+	king.setOutlineColor(get_piece_outline_color(p));
+	const sf::Texture* texture = get_king_texture(p);
+	king.setTexture(texture);
 	draw_shape(s, &king);
-	draw_shape(s, &king_centre);
 }
 void Drawer::draw_border(Square s) {
 	fill_square(s, config::INBORDER_COLOR);
@@ -127,6 +127,7 @@ inline void Drawer::draw_shape(Square s, sf::Shape* shape) {
 	shape->setPosition(s%8 * square_size, s/8 * square_size);
 	window.draw(*shape);
 }
+
 inline sf::Color Drawer::get_piece_outline_color(Side s) {
 	return s == WHITE ? config::WHITE_PIECES_OUTLINE_COLOR: config::BLACK_PIECES_OUTLINE_COLOR;
 }
@@ -135,4 +136,7 @@ inline sf::Color Drawer::get_piece_color(Side s) {
 }
 inline sf::Color Drawer::get_square_color(Side s) {
 	return s == WHITE ? config::WHITE_SQUARE_COLOR: config::BLACK_SQUARE_COLOR;
+}
+inline const sf::Texture* Drawer::get_king_texture(Side s) {
+	return s == WHITE ? &config::WHITE_KING_TEXTURE: &config::BLACK_KING_TEXTURE;
 }
