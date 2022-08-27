@@ -16,7 +16,6 @@ class Drawer {
 	sf::RenderWindow& window;
 	int square_size;
 	Bitboard bordered = 0;
-	std::string text = "";
 public:
 	Drawer(sf::RenderWindow&, Board const&);
 
@@ -24,12 +23,11 @@ public:
 	void border(Bitboard);
 	void unborder_all();
 
-	void redraw();
-	void set_text(std::string);
-
-	void wait_untill_close();
-	Square wait_mouse_click();
+	Square pick_square();
 private:
+	void redraw();
+	Square wait_mouse_click();
+
 	bool is_bordered(Square) const;
 
 	void draw_disc(Square, Side);
@@ -37,10 +35,9 @@ private:
 	void draw_border(Square);
 	void draw_white(Square);
 	void draw_black(Square);
-	void draw_text(std::string);
 
 	inline void fill_square(Square, sf::Color);
 	inline void draw_shape(Square, sf::Shape*);
 };
 
-#endif // #ifndef GUI
+#endif // #ifndef DRAWER

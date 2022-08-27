@@ -10,11 +10,14 @@
 int main(int argc, char *argv[]) {
 	sf::RenderWindow window;
 	window.create(sf::VideoMode(800, 600), "checkers");
-	//Board b;
-	Board b(0x0088'0000'0000'0000, 0x0400);
+	Board b;
 	Bot c(b);
 	Drawer d(window, b);
 	Interface i(b, c, d);
-	i.run();
+	
+	for (;;) {
+		i.human_move(WHITE);
+		i.bot_move(BLACK);
+	}
 	return 0;
 }

@@ -23,56 +23,42 @@ Board::State Board::get_state(Side p) const {
 
 	return PLAYING;
 }
-bool Board::is_must_capture(Side p) const {
-	return is_capture_possible(p);
+bool Board::is_capture_possible(Side p) const {
+	bool r = 0;
+		r |= ul(allof[!p] & ul(discsof[p])) & ~all;
+		r |= ur(allof[!p] & ur(discsof[p])) & ~all;
+		r |= dr(allof[!p] & dr(discsof[p])) & ~all;
+		r |= dl(allof[!p] & dl(discsof[p])) & ~all;
+	
+	for (Bb_iterator i(kingsof[p]); i.not_ended(); ++i)
+		r |= moves_at(*i, p, CaptureTag(), KingTag());
+
+	return r;
 }
 
-void Board::move(Square from, Square to, Side p) {
-	if (is_disc(from, p))
-		move_disc(from, to, p);
-	else
-		move_king(from, to, p);
-}
-void Board::capture(Square from, Square to, Side p) {
-	if (is_disc(from, p))
-		capture_by_disc(from, to, p);
-	else
-		capture_by_king(from, to, p);
-}
-Bitboard Board::moves_at(Square s, Side p) const {
-	if (is_disc(s, p))
-		return disc_moves(s, p);
-	else
-		return king_moves(s, p);
-}
-Bitboard Board::captures_at(Square s, Side p) const {
-	if (is_disc(s, p))
-		return disc_captures(s, p);
-	else
-		return king_captures(s, p);
-}
-
-void Board::move_disc(Square from, Square to, Side p) {
+void Board::move(Square from, Square to, Side p, NoncaptureTag, DiscTag) {
 	set_empty(from, p);
 	set_disc(to, p);
+
 	upgrade_if_nessary(to, p);
 	pass_irreversible();
 }
-void Board::move_king(Square from, Square to, Side p) {
+void Board::move(Square from, Square to, Side p, NoncaptureTag, KingTag) {
 	set_empty(from, p);
 	set_king(to, p);
 	pass_reversible();
 }
-
-void Board::capture_by_disc(Square from, Square to, Side p) {
+void Board::move(Square from, Square to, Side p, CaptureTag, DiscTag) {
 	const Square captured = (from + to)/2;
+
 	set_empty(from, p);
 	set_empty(captured, (Side) !p);
 	set_disc(to, p);
+
 	upgrade_if_nessary(to, p);
 	pass_irreversible();
 }
-void Board::capture_by_king(Square from, Square to, Side p) {
+void Board::move(Square from, Square to, Side p, CaptureTag, KingTag) {
 	const int steps_count = abs(to%8 - from%8);
 	const Direction d = (Direction)((to - from) / steps_count);
 	const Square captured = get_xray_blocker(from, direction_to_num(d));
@@ -84,19 +70,19 @@ void Board::capture_by_king(Square from, Square to, Side p) {
 	pass_irreversible();
 }
 
-Bitboard Board::disc_moves(Square s, Side p) const {
+Bitboard Board::moves_at(Square s, Side p, NoncaptureTag, DiscTag) const {
 	if (p == WHITE)
 		return (ul(1ull << s) & ~all) | (ur(1ull << s) & ~all);
 	else
 		return (dl(1ull << s) & ~all) | (dr(1ull << s) & ~all);
 }
-Bitboard Board::king_moves(Square s, Side p) const {
+Bitboard Board::moves_at(Square s, Side p, NoncaptureTag, KingTag) const {
 	Bitboard r = 0;
 	for (int d_num = 0; d_num < 4; d_num++)
 		r |= cut_xray(s, d_num);
 	return r;
 }
-Bitboard Board::disc_captures(Square s, Side p) const {
+Bitboard Board::moves_at(Square s, Side p, CaptureTag, DiscTag) const {
 	Bitboard r = 0;
 		r |= ul(allof[!p] & ul(1ull << s)) & ~all;
 		r |= ur(allof[!p] & ur(1ull << s)) & ~all;
@@ -104,7 +90,7 @@ Bitboard Board::disc_captures(Square s, Side p) const {
 		r |= dl(allof[!p] & dl(1ull << s)) & ~all;
 	return r;
 }
-Bitboard Board::king_captures(Square s, Side p) const {
+Bitboard Board::moves_at(Square s, Side p, CaptureTag, KingTag) const {
 	Bitboard r = 0;
 	for (int d_num = 0; d_num < 4; d_num++) {
 		Square blocker = get_xray_blocker(s, d_num);
@@ -127,18 +113,27 @@ Bitboard Board::get_kings(Side p) const {
 	return kingsof[p];
 }
 
-inline bool Board::is_capture_possible(Side p) const {
-	bool r = 0;
-		r |= ul(allof[!p] & ul(discsof[p])) & ~all;
-		r |= ur(allof[!p] & ur(discsof[p])) & ~all;
-		r |= dr(allof[!p] & dr(discsof[p])) & ~all;
-		r |= dl(allof[!p] & dl(discsof[p])) & ~all;
-	
-	for (Bb_iterator i(kingsof[p]); i.not_ended(); ++i)
-		r |= king_captures(*i, p);
-
-	return r;
+bool Board::is_empty(Square s) const {
+	return not getbit(all, s);
 }
+bool Board::is_disc(Square s, Side p) const {
+	return getbit(discsof[p], s);
+}
+Side Board::side_at(Square s) const {
+	if (getbit(allof[WHITE], s)) 
+		return WHITE;
+	return BLACK;
+}
+
+inline void Board::upgrade_if_nessary(Square s, Side p) {
+	if (getbit(upgradable[p], s))
+		upgrade(s, p);
+}
+inline void Board::upgrade(Square s, Side p) {
+	set_0(discsof[p], s);
+	set_1(kingsof[p], s);
+}
+
 inline bool Board::is_blocked(Side p) const {
 	if (p == WHITE)
 		return
@@ -166,13 +161,8 @@ inline Bitboard Board::cut_xray(Square s, int d_num) const {
 	return xrays[d_num][s] & ~xrays[d_num][blocker] & ~(1ull << blocker);
 }
 
-inline void Board::upgrade_if_nessary(Square s, Side p) {
-	if (getbit(upgradable[p], s))
-		upgrade(s, p);
-}
-inline void Board::upgrade(Square s, Side p) {
-	set_0(discsof[p], s);
-	set_1(kingsof[p], s);
+KingsPositionHash Board::kings_position_hash() {
+	return (kingsof[WHITE] >> 1) | kingsof[BLACK];
 }
 
 void Board::set_disc(Square s, Side p) {
@@ -192,18 +182,6 @@ void Board::set_empty(Square s, Side p) {
 	set_0(kingsof[p], s);
 }
 
-bool Board::is_empty(Square s) const {
-	return not getbit(all, s);
-}
-bool Board::is_disc(Square s, Side p) const {
-	return getbit(discsof[p], s);
-}
-Side Board::side_at(Square s) const {
-	if (getbit(allof[WHITE], s)) 
-		return WHITE;
-	return BLACK;
-}
-
 inline void Board::pass_reversible() {
 	repetition_history.push_reversible_move(kings_position_hash());
 	++king_moves_counter;
@@ -211,10 +189,6 @@ inline void Board::pass_reversible() {
 inline void Board::pass_irreversible() {
 	repetition_history.push_irreversible_move(kings_position_hash());
 	king_moves_counter.drop();
-}
-
-KingsPositionHash Board::kings_position_hash() {
-	return (kingsof[WHITE] >> 1) | kingsof[BLACK];
 }
 
 

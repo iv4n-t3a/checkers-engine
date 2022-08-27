@@ -1,10 +1,9 @@
 #include <vector>
 
-#include "checkers.h"
-#include "bitboard.h"
 #include "types.h"
-
-#include "config.h"
+#include "bitboard.h"
+#include "checkers.h"
+#include "movegen.h"
 
 #include "bot.h"
 
@@ -12,7 +11,7 @@
 Bot::Bot(Board& b): board(b) {
 }
 void Bot::make_move(Side p) {
-	board = minmax_search(board, p, 8).first;
+	board = minmax_search(board, p, 1).first;
 }
 
 std::pair<Board, Evaluation> Bot::minmax_search(Board const& b, Side p, int depth) {
@@ -26,7 +25,7 @@ std::pair<Board, Evaluation> Bot::minmax_search(Board const& b, Side p, int dept
 	if (depth == 0)
 		return {b, evaluate(b)};
 
-	std::vector<Board> positions = generate_moves(b, p);
+	std::vector<Board> positions = MovesGenerator::get_all_aftermove_positions(b, p);
 	std::pair<Board, Evaluation> best = {b, worst[p]};
 
 	for (Board position: positions) {
@@ -34,32 +33,6 @@ std::pair<Board, Evaluation> Bot::minmax_search(Board const& b, Side p, int dept
 		best = best_position(best, {position, e}, p);
 	}
 	return best;
-}
-std::vector<Board> Bot::generate_moves(Board const& b, Side p) {
-	std::vector<Board> res;
-
-	if (b.is_must_capture(p))
-		for (Bb_iterator i(b.get_all(p)); i.not_ended(); ++i)
-			generate_captures(b, *i, p, res);
-	else
-		for (Bb_iterator i(b.get_all(p)); i.not_ended(); ++i)
-			for (Bb_iterator j(b.moves_at(*i, p)); j.not_ended(); ++j) {
-				Board copy = b;
-				copy.move(*i, *j, p);
-				res.push_back(copy);
-			}
-
-	return res;
-}
-void Bot::generate_captures(Board const& b, Square s, Side p, std::vector<Board>& v) {
-	for (Bb_iterator i(b.captures_at(s, p)); i.not_ended(); ++i) {
-		Board copy = b;
-		copy.capture(s, *i, p);
-		if (copy.captures_at(*i, p))
-			generate_captures(copy, *i, p, v);
-		else
-			v.push_back(copy);
-	}
 }
 inline std::pair<Board, Evaluation> Bot::best_position(
 		std::pair<Board, Evaluation> const& b1, std::pair<Board, Evaluation> const& b2, Side p) {

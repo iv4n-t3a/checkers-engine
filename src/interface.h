@@ -15,17 +15,21 @@ class Interface {
 	Drawer& drawer;
 public:
 	Interface(Board&, Bot&, Drawer&);
-	void run();
+	
+	void bot_move(Side);
+	void human_move(Side);
 private:
-	void computer_move();
 
-	void pick_piece_and_move(bool must_capture);
-	void try_move(Square, bool must_capture);
-	inline void make_capture(Square, Square);
-	void finish_capture(Square);
+	template<typename MoveTypeTag> void pick_piece_and_move(Side);
+	template<typename MoveTypeTag> void try_move(Square, Side);
+	template<typename MoveTypeTag, typename PieceTag> void try_move(Square, Side);
+
+	template<typename PieceTag> inline void make_move(Square, Square, Side, NoncaptureTag);
+	template<typename PieceTag> inline void make_move(Square, Square, Side, CaptureTag);
+	template<typename PieceTag> void finish_capture(Square, Side);
+
 	inline Square pick_move(Bitboard moves);
-	inline bool is_movable(Square) const;
-	inline Square pick_square();
+	inline bool is_movable(Square, Side) const;
 
 	inline void display_state(Side);
 
@@ -33,7 +37,7 @@ private:
 	inline void display_win_of_black();
 	inline void display_draw();
 
-	inline void display_text(std::string);
+	inline void display_end_message(std::string);
 };
 
 #endif

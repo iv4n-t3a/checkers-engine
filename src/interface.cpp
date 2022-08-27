@@ -6,100 +6,97 @@
 #include "bot.h"
 #include "drawer.h"
 
-#include "config.h"
-
 #include "interface.h"
 
 
 Interface::Interface(Board& b, Bot& c, Drawer& d): board(b), bot(c), drawer(d) {
 }
-void Interface::run() {
-	for (;;) {
-		drawer.redraw();
-		/*
-		display_state(config::COMPUTER);
-		computer_move();
-		config::COMPUTER = (Side)!config::COMPUTER;
-		*/
-		display_state(config::PLAYER);
-		pick_piece_and_move(board.is_must_capture(config::PLAYER));
-		config::PLAYER = (Side)!config::PLAYER;
-	}
-}
 
-void Interface::computer_move() {
-	sf::Thread t([this] () {
+sf::Mutex m;
+void Interface::bot_move(Side p) {
+	display_state(p);
+	sf::Thread t([this]() {
 		for (;;) {
-			drawer.wait_mouse_click();
+			m.lock();
+			drawer.pick_square();
+			m.unlock();
 		}
 	});
-	bot.make_move(config::COMPUTER);
+	t.launch();
+	bot.make_move(p);
 	t.terminate();
 }
-void Interface::pick_piece_and_move(bool must_capture) {
-	Square s = pick_square();
-	if (not is_movable(s)) {
-		pick_piece_and_move(must_capture);
+void Interface::human_move(Side p) {
+	display_state(p);
+	if (board.is_capture_possible(p))
+		pick_piece_and_move<CaptureTag>(p);
+	else
+		pick_piece_and_move<NoncaptureTag>(p);
+}
+
+template <typename M>
+void Interface::pick_piece_and_move(Side p) {
+	Square s;
+	do
+		s = drawer.pick_square();
+	while (s == NONE_SQUARE);
+
+	try_move<M> (s, p);
+}
+template <typename M>
+void Interface::try_move(Square s, Side p) {
+	if (board.is_disc(s, p))
+		try_move<M, DiscTag>(s, p);
+	else
+		try_move<M, KingTag>(s, p);
+}
+template <typename M, typename P>
+void Interface::try_move(Square s, Side p) {
+	if (not is_movable(s, p)) {
+		pick_piece_and_move<M>(p);
 		return;
 	}
-	try_move(s, must_capture);
-}
-void Interface::try_move(Square s, bool must_capture) {
+
 	Bitboard moves;
-	if (must_capture)
-		moves = board.captures_at(s, config::PLAYER);
+	moves = board.moves_at(s, p, M(), P());
+	Square choice = pick_move(moves);
+
+	if (getbit(moves, choice))
+		make_move<P>(s, choice, p, M());
 	else
-		moves = board.moves_at(s, config::PLAYER);
-
-	Square choice = pick_move(moves);
-
-	if (getbit(moves, choice)) {
-		if (must_capture)
-			make_capture(s, choice);
-		else
-			board.move(s, choice, config::PLAYER);
-	} else {
-		if (is_movable(choice))
-			try_move(choice, must_capture);
-		else
-			pick_piece_and_move(must_capture);
-	}
+		try_move<M>(choice, p);
 }
-inline void Interface::make_capture(Square from, Square to) {
-	board.capture(from, to, config::PLAYER);
-	if (board.captures_at(to, config::PLAYER))
-		finish_capture(to);
+template <typename P>
+inline void Interface::make_move(Square from, Square to, Side p, NoncaptureTag) {
+	board.move(from, to, p, NoncaptureTag(), P());
 }
-void Interface::finish_capture(Square s) {
-	std::cout << s << std::endl;
-
-	Bitboard moves = board.captures_at(s, config::PLAYER);
+template <typename P>
+inline void Interface::make_move(Square from, Square to, Side p, CaptureTag) {
+	board.move(from, to, p, CaptureTag(), P());
+	if (board.moves_at(to, p, CaptureTag(), P()))
+		finish_capture<P>(to, p);
+}
+template <typename P>
+void Interface::finish_capture(Square s, Side p) {
+	Bitboard moves = board.moves_at(s, p, CaptureTag(), P());
 	Square choice = pick_move(moves);
 	if (getbit(moves, choice)) {
-		make_capture(s, choice);
+		make_move<P>(s, choice, p, CaptureTag());
 		return;
 	} else {
 		do
-			choice = pick_square();
+			choice = drawer.pick_square();
 		while (choice != s);
-		finish_capture(s);
+		finish_capture<P>(s, p);
 	}
 }
 Square Interface::pick_move(Bitboard moves) {
 	drawer.border(moves);
-	Square choice = pick_square();
+	Square choice = drawer.pick_square();
 	return choice;
 }
-inline Square Interface::pick_square() {
-	Square choice = NONE_SQUARE;
-	while (choice == NONE_SQUARE)
-		choice = drawer.wait_mouse_click();
-	drawer.unborder_all();
-	drawer.border(choice);
-	return choice;
-}
-inline bool Interface::is_movable(Square s) const {
-	return not (s == NONE_SQUARE or board.is_empty(s) or board.side_at(s) != config::PLAYER);
+inline bool Interface::is_movable(Square s, Side p) const {
+	return s != NONE_SQUARE and not board.is_empty(s) and board.side_at(s) == p;
 }
 
 inline void Interface::display_state(Side p) {
@@ -112,16 +109,16 @@ inline void Interface::display_state(Side p) {
 }
 
 inline void Interface::display_win_of_white() {
-	display_text("White win!");
+	display_end_message("White win!");
 }
 inline void Interface::display_win_of_black() {
-	display_text("Black win!");
+	display_end_message("Black win!");
 }
 inline void Interface::display_draw() {
-	display_text("Draw!");
+	display_end_message("Draw!");
 }
 
-inline void Interface::display_text(std::string text) {
+inline void Interface::display_end_message(std::string text) {
 	std::cout << text << std::endl;
 	exit(0);
 }

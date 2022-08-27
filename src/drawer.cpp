@@ -11,13 +11,37 @@
 
 
 Drawer::Drawer(sf::RenderWindow& w, Board const& b): window(w), board(b) {
+	sf::Vector2u size = window.getSize();
+	square_size = std::min(size.x, size.y) / 8;
+	redraw();
 }
+
+void Drawer::border(Square s) {
+	set_1(bordered, s);
+	redraw();
+}
+void Drawer::border(Bitboard bb) {
+	bordered |= bb;
+	redraw();
+}
+void Drawer::unborder_all() {
+	bordered = 0;
+	redraw();
+}
+
+Square Drawer::pick_square() {
+	Square choice;
+	do
+		choice = wait_mouse_click();
+	while (choice == NONE_SQUARE);
+	unborder_all();
+	border(choice);
+	return choice;
+}
+
 
 void Drawer::redraw() {
 	window.clear(config::BACKGROUND_COLOR);
-	sf::Vector2u size = window.getSize();
-	square_size = std::min(size.x, size.y)/8;
-
 	for (Square s = 0; s < 64; s++) {
 		constexpr Bitboard WHITE = 0xaa55'aa55'aa55'aa55;
 		if (getbit(WHITE, s))
@@ -61,38 +85,12 @@ Square Drawer::wait_mouse_click() {
 	return NONE_SQUARE;
 }
 
-void Drawer::set_text(std::string t) {
-	text = t;
-}
-
-void Drawer::border(Square s) {
-	if (s == NONE_SQUARE) {
-		unborder_all();
-		return;
-	}
-	set_1(bordered, s);
-}
-void Drawer::border(Bitboard bb) {
-	bordered |= bb;
-}
-void Drawer::unborder_all() {
-	bordered = 0;
-}
-
 bool Drawer::is_bordered(Square s) const {
 	if (s == NONE_SQUARE)
 		return false;
 	return getbit(bordered, s);
 }
 
-void Drawer::draw_text(std::string t) {
-	sf::Text sftext;
-	sftext.setString(t);
-	sftext.setCharacterSize(24);
-	sftext.setFillColor(config::TEXT_COLOR);
-	window.draw(sftext);
-	window.display();
-}
 void Drawer::draw_disc(Square s, Side p) {
 	sf::CircleShape disc(square_size / 2);
 	disc.setFillColor(config::PIECE_COLOR[p]);
@@ -117,6 +115,7 @@ void Drawer::draw_white(Square s) {
 void Drawer::draw_black(Square s) {
 	fill_square(s, config::SQUARE_COLOR[BLACK]);
 }
+
 inline void Drawer::fill_square(Square s, sf::Color c) {
 	sf::RectangleShape r(sf::Vector2f(square_size, square_size));
 	r.setFillColor(c);
