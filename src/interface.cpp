@@ -45,6 +45,11 @@ void Interface::pick_piece_and_move(Side p) {
 }
 template <typename M>
 void Interface::try_move(Square s, Side p) {
+	if (board.is_empty(s)) {
+		pick_piece_and_move<M>(p);
+		return;
+	}
+
 	if (board.is_disc(s, p))
 		try_move<M, DiscTag>(s, p);
 	else
@@ -57,8 +62,7 @@ void Interface::try_move(Square s, Side p) {
 		return;
 	}
 
-	Bitboard moves;
-	moves = board.moves_at(s, p, M(), P());
+	Bitboard moves = board.moves_at(s, p, M(), P());
 	Square choice = pick_move(moves);
 
 	if (getbit(moves, choice))
@@ -80,10 +84,9 @@ template <typename P>
 void Interface::finish_capture(Square s, Side p) {
 	Bitboard moves = board.moves_at(s, p, CaptureTag(), P());
 	Square choice = pick_move(moves);
-	if (getbit(moves, choice)) {
+	if (getbit(moves, choice))
 		make_move<P>(s, choice, p, CaptureTag());
-		return;
-	} else {
+	else {
 		do
 			choice = drawer.pick_square();
 		while (choice != s);
