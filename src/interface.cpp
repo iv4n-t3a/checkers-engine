@@ -1,4 +1,3 @@
-#include <SFML/System.hpp>
 #include <string>
 
 #include "types.h"
@@ -12,19 +11,10 @@
 Interface::Interface(Board& b, Bot& c, Drawer& d): board(b), bot(c), drawer(d) {
 }
 
-sf::Mutex m;
 void Interface::bot_move(Side p) {
 	display_state(p);
-	sf::Thread t([this]() {
-		for (;;) {
-			m.lock();
-			drawer.pick_square();
-			m.unlock();
-		}
-	});
-	t.launch();
 	bot.make_move(p);
-	t.terminate();
+	drawer.redraw();
 }
 void Interface::human_move(Side p) {
 	display_state(p);

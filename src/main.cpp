@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
 	Interface i(b, c, d);
 	
 	for (;;) {
-		i.human_move(WHITE);
+		i.bot_move(WHITE);
 		i.bot_move(BLACK);
 	}
 	return 0;

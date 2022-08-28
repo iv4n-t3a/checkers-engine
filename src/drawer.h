@@ -24,8 +24,8 @@ public:
 	void unborder_all();
 
 	Square pick_square();
-private:
 	void redraw();
+private:
 	Square wait_mouse_click();
 
 	bool is_bordered(Square) const;
