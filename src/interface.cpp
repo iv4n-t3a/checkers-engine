@@ -123,5 +123,5 @@ inline void Interface::display_draw() {
 
 inline void Interface::display_end_message(std::string text) {
 	std::cout << text << std::endl;
-	exit(0);
+	std::exit(0);
 }
