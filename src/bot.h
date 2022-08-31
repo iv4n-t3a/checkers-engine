@@ -20,10 +20,9 @@ public:
 	Bot(Board&);
 	void make_move(Side);
 private:
-	static std::pair<Board, Evaluation> minmax_search(Board const&, Side, int depth);
-	static std::vector<Board> generate_moves(Board const&, Side);
-	static void generate_captures(Board const&, Square, Side, std::vector<Board>&);
-	static inline Evaluation evaluate(Board const&);
+	static Evaluation dynamic_evaluate(Board const&, Side, int depth);
+	static inline Evaluation static_evaluate(Board const&);
+	static inline Evaluation best_evaluation(Evaluation, Evaluation, Side);
 	static inline std::pair<Board, Evaluation> best_position(
 		std::pair<Board, Evaluation> const&, std::pair<Board, Evaluation> const&, Side);
 };
