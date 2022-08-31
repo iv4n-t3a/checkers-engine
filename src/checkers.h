@@ -83,7 +83,7 @@ protected:
 	inline Square get_xray_blocker(Square, int direction_num) const;
 	inline Bitboard cut_xray(Square, int direction_num) const;
 
-	inline KingsPositionHash kings_position_hash();
+	inline KingsPositionHash kings_position_hash() const;
 
 	void set_disc(Square, Side);
 	void set_king(Square, Side);

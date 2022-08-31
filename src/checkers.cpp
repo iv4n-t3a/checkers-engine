@@ -161,7 +161,7 @@ inline Bitboard Board::cut_xray(Square s, int d_num) const {
 	return xrays[d_num][s] & ~xrays[d_num][blocker] & ~(1ull << blocker);
 }
 
-KingsPositionHash Board::kings_position_hash() {
+KingsPositionHash Board::kings_position_hash() const {
 	return (kingsof[WHITE] >> 1) | kingsof[BLACK];
 }
 
