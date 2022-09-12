@@ -35,6 +35,13 @@ bool Board::is_capture_possible(Side p) const {
 
 	return r;
 }
+bool Board::operator==(Board other) const {
+	return 
+		discsof[WHITE] == other.discsof[WHITE] and
+		discsof[BLACK] == other.discsof[BLACK] and
+		kingsof[WHITE] == other.kingsof[WHITE] and
+		kingsof[BLACK] == other.kingsof[BLACK];
+}
 
 void Board::move(Square from, Square to, Side p, NoncaptureTag, DiscTag) {
 	set_empty(from, p);

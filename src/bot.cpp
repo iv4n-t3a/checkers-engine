@@ -1,4 +1,5 @@
 #include <vector>
+#include <assert.h>
 
 #include "types.h"
 #include "bitboard.h"
@@ -26,6 +27,12 @@ void Bot::make_move() {
 		std::pair<Board, Evaluation> processing = {b, dynamic_evaluate<typename MinMaxTag::opposite>(b, 6)};
 		best = best_position(best, processing, MinMaxTag());
 	}
+
+	bool flag = false;
+	for (Board b: positions)
+		flag |= best.first == b;
+	assert(flag);
+
 	board = best.first;
 }
 

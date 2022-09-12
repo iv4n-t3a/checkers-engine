@@ -54,6 +54,7 @@ public:
 
 	State get_state(Side) const;
 	bool is_capture_possible(Side) const;
+	bool operator==(Board b) const;
 
 	void move(Square, Square, Side, NoncaptureTag, DiscTag);
 	void move(Square, Square, Side, NoncaptureTag, KingTag);
