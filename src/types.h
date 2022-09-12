@@ -55,7 +55,7 @@ constexpr uint8_t direction_to_num(Direction d) {
 
 // bot
 
-typedef float Evaluation;
+typedef int Evaluation;
 
 struct MaxTag;
 struct MinTag;

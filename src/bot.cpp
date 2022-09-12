@@ -96,9 +96,11 @@ inline Evaluation Bot::evaluate_aborted(AlphaBeta ab, MinTag) {
 }
 
 inline Evaluation Bot::static_evaluate(Board const& b) {
-	constexpr int king_cost = 8;
-	return (Evaluation)
-	((bb_popcount(b.get_discs(WHITE)) + king_cost*bb_popcount(b.get_kings(WHITE))) -
-	 (bb_popcount(b.get_discs(BLACK)) + king_cost*bb_popcount(b.get_kings(BLACK)))) /
-	(Evaluation) bb_popcount(b.get_all());
+	if (b.get_kings(WHITE) and b.get_kings(BLACK))
+		return 0;
+
+	static constexpr int king_cost = 15;
+	return 
+		 bb_popcount(b.get_discs(MaxTag::side)) - bb_popcount(b.get_discs(MinTag::side)) +
+		(bb_popcount(b.get_kings(MaxTag::side)) - bb_popcount(b.get_discs(MinTag::side)))*king_cost;
 }
