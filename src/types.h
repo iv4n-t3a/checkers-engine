@@ -53,5 +53,26 @@ constexpr uint8_t direction_to_num(Direction d) {
 	return -1;
 }
 
+// bot
+
+typedef float Evaluation;
+
+struct MaxTag;
+struct MinTag;
+typedef MaxTag WhiteMinMaxTag;
+typedef MinTag BlackMinMaxTag;
+struct MaxTag {
+	typedef MinTag opposite;
+	static constexpr Side side = WHITE;
+};
+struct MinTag {
+	typedef MaxTag opposite;
+	static constexpr Side side = BLACK;
+};
+
+struct AlphaBeta {
+	Evaluation alpha, beta;
+};
+
 
 #endif

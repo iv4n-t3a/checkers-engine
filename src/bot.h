@@ -1,30 +1,43 @@
 #ifndef BOT
 #define BOT
 
+#include <limits>
 #include <array>
 #include <vector>
 #include <tuple>
 
+#include "types.h"
 #include "checkers.h"
 
-typedef float Evaluation;
 
 class Bot {
 	Board& board;
-	static constexpr std::array<Evaluation, 2> best = {
-		std::numeric_limits<Evaluation>::max(),
-		std::numeric_limits<Evaluation>::min()
-	};
-	static constexpr std::array<Evaluation, 2> worst = {best[BLACK], best[WHITE]};
 public:
 	Bot(Board&);
 	void make_move(Side);
+
 private:
-	static Evaluation dynamic_evaluate(Board const&, Side, int depth);
-	static inline Evaluation static_evaluate(Board const&);
-	static inline Evaluation best_evaluation(Evaluation, Evaluation, Side);
+	template <typename MinMaxTag> void make_move();
+
+	template <typename MinMaxTag> static Evaluation dynamic_evaluate(Board const&, int depth);
+
+	static Evaluation dynamic_evaluate(Board const&, int depth, MinTag);
+	static Evaluation dynamic_evaluate(Board const&, int depth, MaxTag);
+
+	static Evaluation best_evaluation(Evaluation e1, Evaluation e2, MinTag);
+	static Evaluation best_evaluation(Evaluation e1, Evaluation e2, MaxTag);
+
 	static inline std::pair<Board, Evaluation> best_position(
-		std::pair<Board, Evaluation> const&, std::pair<Board, Evaluation> const&, Side);
+		std::pair<Board, Evaluation> const&, std::pair<Board, Evaluation> const&, MinTag);
+	static inline std::pair<Board, Evaluation> best_position(
+		std::pair<Board, Evaluation> const&, std::pair<Board, Evaluation> const&, MaxTag);
+
+	static inline Evaluation worst(MinTag);
+	static inline Evaluation worst(MaxTag);
+	static inline Evaluation best(MinTag);
+	static inline Evaluation best(MaxTag);
+
+	static inline Evaluation static_evaluate(Board const&);
 };
 
 #endif // #ifndef BOT
