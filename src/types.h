@@ -75,7 +75,7 @@ struct MinTag {
 };
 
 struct AlphaBeta {
-	Evaluation alpha, beta;
+	Evaluation alpha = MaxTag::worst, beta = MinTag::worst;
 };
 
 
