@@ -26,9 +26,6 @@ namespace config {
 		"textures/black-king.png"
 	};
 	
-	static Side PLAYER = WHITE;
-	static Side COMPUTER = BLACK;
-
 	static const sf::Color INBORDER_COLOR = sf::Color(218, 165, 32);
 	static const sf::Color BACKGROUND_COLOR = sf::Color::Cyan;
 	static const sf::Color TEXT_COLOR = sf::Color::Cyan;
