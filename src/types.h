@@ -64,10 +64,14 @@ typedef MinTag BlackMinMaxTag;
 struct MaxTag {
 	typedef MinTag opposite;
 	static constexpr Side side = WHITE;
+	static constexpr Evaluation worst = std::numeric_limits<Evaluation>::min();
+	static constexpr Evaluation best = std::numeric_limits<Evaluation>::max();
 };
 struct MinTag {
 	typedef MaxTag opposite;
 	static constexpr Side side = BLACK;
+	static constexpr Evaluation worst = std::numeric_limits<Evaluation>::max();
+	static constexpr Evaluation best = std::numeric_limits<Evaluation>::min();
 };
 
 struct AlphaBeta {

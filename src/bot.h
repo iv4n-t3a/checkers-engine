@@ -19,23 +19,21 @@ public:
 private:
 	template <typename MinMaxTag> void make_move();
 
-	template <typename MinMaxTag> static Evaluation dynamic_evaluate(Board const&, int depth);
+	template <typename MinMaxTag> static Evaluation dynamic_evaluate(Board const&, int depth, AlphaBeta);
 
-	static Evaluation dynamic_evaluate(Board const&, int depth, MinTag);
-	static Evaluation dynamic_evaluate(Board const&, int depth, MaxTag);
-
-	static Evaluation best_evaluation(Evaluation e1, Evaluation e2, MinTag);
-	static Evaluation best_evaluation(Evaluation e1, Evaluation e2, MaxTag);
+	static Evaluation best_evaluation(Evaluation, Evaluation, MinTag);
+	static Evaluation best_evaluation(Evaluation, Evaluation, MaxTag);
 
 	static inline std::pair<Board, Evaluation> best_position(
 		std::pair<Board, Evaluation> const&, std::pair<Board, Evaluation> const&, MinTag);
 	static inline std::pair<Board, Evaluation> best_position(
 		std::pair<Board, Evaluation> const&, std::pair<Board, Evaluation> const&, MaxTag);
 
-	static inline Evaluation worst(MinTag);
-	static inline Evaluation worst(MaxTag);
-	static inline Evaluation best(MinTag);
-	static inline Evaluation best(MaxTag);
+	static inline AlphaBeta update_alpha_beta(Evaluation, AlphaBeta, MaxTag);
+	static inline AlphaBeta update_alpha_beta(Evaluation, AlphaBeta, MinTag);
+
+	static inline Evaluation evaluate_aborted(AlphaBeta, MaxTag);
+	static inline Evaluation evaluate_aborted(AlphaBeta, MinTag);
 
 	static inline Evaluation static_evaluate(Board const&);
 };
