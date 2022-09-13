@@ -21,18 +21,6 @@ inline uint8_t bb_popcount(Bitboard bb) {
 }
 
 
-/**************************************
-* traditionaly in chess programming   *
-* directions are called as in         * 
-* compase rose                        *
-*               north(+8)             *
-*  north-west(+9) | north-east(+7)    *
-*                \|/                  *
-*     west(+1) <--+--> east(-1)       *
-*                /|\                  *
-*  south-west(-7) | south-east(-9)    *
-*               south(-8)             *
-**************************************/
 constexpr Bitboard W_move(Bitboard bb) {
 	return (bb & 0xfefe'fefe'fefe'fefe) >> 1;
 }

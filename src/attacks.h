@@ -41,4 +41,4 @@ constexpr std::array<Map, 2> init_disc_moves() {
 constexpr std::array<Map, 4> xrays = init_xrays();
 constexpr std::array<Map, 2> disc_moves = init_disc_moves();
 
-#endif
+#endif // #ifndef ATTACKS

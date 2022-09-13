@@ -38,4 +38,4 @@ namespace config {
 	} ();
 }
 
-#endif
+#endif // #ifndef CONFIG

@@ -36,11 +36,6 @@ class NoncaptureTag {};
 class CaptureTag {};
 
 
-enum Direction {
-	NORTH_EAST = 9,
-	NORTH_WEST = 7,
-	SOUTH_EAST = -NORTH_WEST,
-	SOUTH_WEST = -NORTH_EAST
 /**************************************
 * traditionaly in chess programming   *
 * directions are called as in         * 
@@ -53,6 +48,11 @@ enum Direction {
 *  south-west(-7) | south-east(-9)    *
 *               south(-8)             *
 **************************************/
+enum Direction {
+	NORTH_EAST = 9,
+	NORTH_WEST = 7,
+	SOUTH_EAST = -NORTH_WEST,
+	SOUTH_WEST = -NORTH_EAST
 };
 constexpr std::array<Direction, 4> dirs = {NORTH_EAST, NORTH_WEST, SOUTH_EAST, SOUTH_WEST};
 constexpr std::array<bool, 4> is_bsf_direction = {true, true, false, false};
@@ -66,4 +66,4 @@ constexpr uint8_t direction_to_num(Direction d) {
 	}
 	return -1;
 }
-#endif
+#endif // #ifndef TYPES

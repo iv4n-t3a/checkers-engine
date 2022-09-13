@@ -40,4 +40,4 @@ private:
 	inline void display_end_message(std::string);
 };
 
-#endif
+#endif // #ifndef INTERFACE
