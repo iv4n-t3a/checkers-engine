@@ -1,14 +1,14 @@
 #include <string>
 
 #include "types.h"
-#include "checkers.h"
+#include "position.h"
 #include "bot.h"
 #include "drawer.h"
 
 #include "interface.h"
 
 
-Interface::Interface(Board& b, Bot& c, Drawer& d): board(b), bot(c), drawer(d) {
+Interface::Interface(Position& b, Bot& c, Drawer& d): board(b), bot(c), drawer(d) {
 }
 
 void Interface::bot_move(Side p) {
@@ -94,10 +94,10 @@ inline bool Interface::is_movable(Square s, Side p) const {
 
 inline void Interface::display_state(Side p) {
 	switch (board.get_state(p)) {
-		case Board::WHITE_WIN: display_win_of_white(); break;
-		case Board::BLACK_WIN: display_win_of_black(); break;
-		case Board::DRAW: display_draw(); break;
-		case Board::PLAYING: return;
+		case Position::WHITE_WIN: display_win_of_white(); break;
+		case Position::BLACK_WIN: display_win_of_black(); break;
+		case Position::DRAW: display_draw(); break;
+		case Position::PLAYING: return;
 	}
 }
 

@@ -20,24 +20,37 @@ inline uint8_t bb_popcount(Bitboard bb) {
 	  return __builtin_popcountll(bb);
 }
 
-constexpr Bitboard rmove(Bitboard bb) {
+
+/**************************************
+* traditionaly in chess programming   *
+* directions are called as in         * 
+* compase rose                        *
+*               north(+8)             *
+*  north-west(+9) | north-east(+7)    *
+*                \|/                  *
+*     west(+1) <--+--> east(-1)       *
+*                /|\                  *
+*  south-west(-7) | south-east(-9)    *
+*               south(-8)             *
+**************************************/
+constexpr Bitboard W_move(Bitboard bb) {
 	return (bb & 0xfefe'fefe'fefe'fefe) >> 1;
 }
-constexpr Bitboard lmove(Bitboard bb) {
+constexpr Bitboard E_move(Bitboard bb) {
 	return (bb & 0x7f7f'7f7f'7f7f'7f7f) << 1;
 }
 
-constexpr Bitboard ur(Bitboard bb) { // up right
-	return rmove(bb) << 8;
+constexpr Bitboard NW_move(Bitboard bb) {
+	return W_move(bb) << 8;
 }
-constexpr Bitboard ul(Bitboard bb) {
-	return lmove(bb) << 8;
+constexpr Bitboard NE_move(Bitboard bb) {
+	return E_move(bb) << 8;
 }
-constexpr Bitboard dr(Bitboard bb) {
-	return rmove(bb) >> 8;
+constexpr Bitboard SW_move(Bitboard bb) {
+	return W_move(bb) >> 8;
 }
-constexpr Bitboard dl(Bitboard bb) { // down left
-	return lmove(bb) >> 8;
+constexpr Bitboard SE_move(Bitboard bb) {
+	return E_move(bb) >> 8;
 }
 
 

@@ -4,17 +4,17 @@
 #include <string>
 
 #include "types.h"
-#include "checkers.h"
+#include "position.h"
 #include "bot.h"
 #include "drawer.h"
 
 
 class Interface {
-	Board& board;
+	Position& board;
 	Bot& bot;
 	Drawer& drawer;
 public:
-	Interface(Board&, Bot&, Drawer&);
+	Interface(Position&, Bot&, Drawer&);
 	
 	void bot_move(Side);
 	void human_move(Side);

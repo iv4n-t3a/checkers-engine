@@ -5,9 +5,10 @@
 #include <array>
 
 
+
 typedef uint64_t Bitboard;
-typedef uint64_t KingsPositionHash;
 typedef uint8_t Square;
+typedef uint64_t KingsPositionHash;
 typedef int MovesCount;
 typedef std::array<Bitboard, 65> Map;
 
@@ -34,11 +35,24 @@ class KingTag {};
 class NoncaptureTag {};
 class CaptureTag {};
 
+
 enum Direction {
 	NORTH_EAST = 9,
 	NORTH_WEST = 7,
 	SOUTH_EAST = -NORTH_WEST,
 	SOUTH_WEST = -NORTH_EAST
+/**************************************
+* traditionaly in chess programming   *
+* directions are called as in         * 
+* compase rose                        *
+*               north(+8)             *
+*  north-west(+9) | north-east(+7)    *
+*                \|/                  *
+*     west(+1) <--+--> east(-1)       *
+*                /|\                  *
+*  south-west(-7) | south-east(-9)    *
+*               south(-8)             *
+**************************************/
 };
 constexpr std::array<Direction, 4> dirs = {NORTH_EAST, NORTH_WEST, SOUTH_EAST, SOUTH_WEST};
 constexpr std::array<bool, 4> is_bsf_direction = {true, true, false, false};
@@ -52,31 +66,4 @@ constexpr uint8_t direction_to_num(Direction d) {
 	}
 	return -1;
 }
-
-// bot
-
-typedef int Evaluation;
-
-struct MaxTag;
-struct MinTag;
-typedef MaxTag WhiteMinMaxTag;
-typedef MinTag BlackMinMaxTag;
-struct MaxTag {
-	typedef MinTag opposite;
-	static constexpr Side side = WHITE;
-	static constexpr Evaluation worst = std::numeric_limits<Evaluation>::min();
-	static constexpr Evaluation best = std::numeric_limits<Evaluation>::max();
-};
-struct MinTag {
-	typedef MaxTag opposite;
-	static constexpr Side side = BLACK;
-	static constexpr Evaluation worst = std::numeric_limits<Evaluation>::max();
-	static constexpr Evaluation best = std::numeric_limits<Evaluation>::min();
-};
-
-struct AlphaBeta {
-	Evaluation alpha = MaxTag::worst, beta = MinTag::worst;
-};
-
-
 #endif

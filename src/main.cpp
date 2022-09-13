@@ -2,7 +2,7 @@
 
 #include "config.h"
 
-#include "checkers.h"
+#include "position.h"
 #include "bot.h"
 #include "interface.h"
 
@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
 	parse_args(argc, argv);
 	sf::RenderWindow window;
 	window.create(sf::VideoMode(800, 600), "checkers");
-	Board b;
+	Position b;
 	Bot c(b);
 	Drawer d(window, b);
 	Interface i(b, c, d);

@@ -3,14 +3,14 @@
 
 #include "types.h"
 #include "bitboard.h"
-#include "checkers.h"
+#include "position.h"
 
 #include "config.h"
 
 #include "drawer.h"
 
 
-Drawer::Drawer(sf::RenderWindow& w, Board const& b): window(w), board(b) {
+Drawer::Drawer(sf::RenderWindow& w, Position const& b): window(w), board(b) {
 	sf::Vector2u size = window.getSize();
 	square_size = std::min(size.x, size.y) / 8;
 	redraw();

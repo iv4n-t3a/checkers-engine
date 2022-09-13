@@ -1,5 +1,5 @@
-#ifndef GAME
-#define GAME
+#ifndef POSITION
+#define POSITION
 
 #include <unordered_set>
 #include <stack>
@@ -30,7 +30,7 @@ public:
 	bool is_draw() const;
 };
 
-class Board {
+class Position {
 public:
 	enum State {
 		WHITE_WIN = WHITE,
@@ -49,12 +49,12 @@ protected:
 	KingMovesCounter king_moves_counter;
 	RepetitionHistory repetition_history;
 public:
-	Board(Bitboard white_discs = 0x0000'0000'00aa'55aa,
+	Position(Bitboard white_discs = 0x0000'0000'00aa'55aa,
 	      Bitboard black_discs = 0x55aa'5500'0000'0000);
 
 	State get_state(Side) const;
 	bool is_capture_possible(Side) const;
-	bool operator==(Board b) const;
+	bool operator==(Position b) const;
 
 	void move(Square, Square, Side, NoncaptureTag, DiscTag);
 	void move(Square, Square, Side, NoncaptureTag, KingTag);
@@ -95,4 +95,4 @@ protected:
 
 };
 
-#endif // #ifndef GAME
+#endif // #ifndef POSITION

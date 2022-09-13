@@ -8,16 +8,16 @@
 #include <SFML/Graphics.hpp>
 
 #include "types.h"
-#include "checkers.h"
+#include "position.h"
 #include "bot.h"
 
 class Drawer {
-	Board const& board;
+	Position const& board;
 	sf::RenderWindow& window;
 	int square_size;
 	Bitboard bordered = 0;
 public:
-	Drawer(sf::RenderWindow&, Board const&);
+	Drawer(sf::RenderWindow&, Position const&);
 
 	void border(Square);
 	void border(Bitboard);

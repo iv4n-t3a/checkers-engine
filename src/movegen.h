@@ -3,18 +3,18 @@
 
 #include <vector>
 
-#include "checkers.h"
+#include "position.h"
 
 class MovesGenerator {
 public:
-	static std::vector<Board> get_all_aftermove_positions(Board const&, Side);
+	static std::vector<Position> get_all_aftermove_positions(Position const&, Side);
 private:
-	template <typename MoveTypeTag> static std::vector<Board> gen_moves(Board const&, Side);
+	template <typename MoveTypeTag> static std::vector<Position> gen_moves(Position const&, Side);
 
 	template <typename PieceTag> static void
-		gen_moves(Board const&, Square, Side, std::vector<Board>&, NoncaptureTag);
+		gen_moves(Position const&, Square, Side, std::vector<Position>&, NoncaptureTag);
 	template <typename PieceTag> static void 
-		gen_moves(Board const&, Square, Side, std::vector<Board>&, CaptureTag );
+		gen_moves(Position const&, Square, Side, std::vector<Position>&, CaptureTag );
 };
 
 #endif
