@@ -8,7 +8,7 @@
 #include "bitboard.h"
 
 constexpr std::array<Map, 4> init_xrays() {
-	std::array<Map, 4> res{};
+	std::array<Map, 4> res;
 	for (Square s = 0; s < 64; s++) {
 		std::array<Bitboard, 4> bb;
 		for (int i = 0; i < 4; i++)
@@ -29,35 +29,16 @@ constexpr std::array<Map, 4> init_xrays() {
 
 	return res;
 }
-constexpr std::array<Map, 4> init_disc_attack() {
-	std::array<Map, 4> res{};
+constexpr std::array<Map, 2> init_disc_moves() {
+	std::array<Map, 2> r;
 	for (Square s = 0; s < 64; s++) {
-		res[0][s] = NE_move(1ull << s);
-		res[1][s] = NW_move(1ull << s);
-		res[2][s] = SE_move(1ull << s);
-		res[3][s] = SW_move(1ull << s);
+		r[WHITE][s] = NE_move(1ull << s) | NW_move(1ull << s);
+		r[BLACK][s] = SE_move(1ull << s) | SW_move(1ull << s);
 	}
-	for (int i = 0; i < 4; i++)
-		res[i][NONE_SQUARE] = 0;
-
-	return res;
-}
-constexpr std::array<Map, 4> init_disc_after_attack() {
-	std::array<Map, 4> res{};
-	for (Square s = 0; s < 64; s++) {
-		res[0][s] = NE_move(NE_move(1ull << s));
-		res[1][s] = NW_move(NW_move(1ull << s));
-		res[2][s] = SE_move(SE_move(1ull << s));
-		res[3][s] = SW_move(SW_move(1ull << s));
-	}
-	for (int i = 0; i < 4; i++)
-		res[i][NONE_SQUARE] = 0;
-
-	return res;
+	return r;
 }
 
 constexpr std::array<Map, 4> xrays = init_xrays();
-constexpr std::array<Map, 4> disc_attack = init_disc_attack();
-constexpr std::array<Map, 4> disc_after_attack = init_disc_after_attack();
+constexpr std::array<Map, 2> disc_moves = init_disc_moves();
 
 #endif

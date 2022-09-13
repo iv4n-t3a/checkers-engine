@@ -29,11 +29,12 @@ bool Position::is_capture_possible(Side p) const {
 		r |= NW_move(allof[!p] & NW_move(discsof[p])) & ~all;
 		r |= SE_move(allof[!p] & SE_move(discsof[p])) & ~all;
 		r |= SW_move(allof[!p] & SW_move(discsof[p])) & ~all;
-	
-	for (Bb_iterator i(kingsof[p]); i.not_ended(); ++i)
-		r |= moves_at(*i, p, CaptureTag(), KingTag());
+	if (r) return true;
 
-	return r;
+	for (Bb_iterator i(kingsof[p]); i.not_ended(); ++i)
+		if (moves_at(*i, p, CaptureTag(), KingTag())) return true;
+
+	return false;
 }
 bool Position::operator==(Position other) const {
 	return 
@@ -78,15 +79,15 @@ void Position::move(Square from, Square to, Side p, CaptureTag, KingTag) {
 }
 
 Bitboard Position::moves_at(Square s, Side p, NoncaptureTag, DiscTag) const {
-	if (p == WHITE)
-		return (NE_move(1ull << s) & ~all) | (NW_move(1ull << s) & ~all);
-	else
-		return (SE_move(1ull << s) & ~all) | (SW_move(1ull << s) & ~all);
+	return disc_moves[p][s] & ~all;
 }
 Bitboard Position::moves_at(Square s, Side p, NoncaptureTag, KingTag) const {
 	Bitboard r = 0;
-	for (int d_num = 0; d_num < 4; d_num++)
-		r |= cut_xray(s, d_num);
+	r |= cut_xray(s, 0);
+	r |= cut_xray(s, 1);
+	r |= cut_xray(s, 2);
+	r |= cut_xray(s, 3);
+
 	return r;
 }
 Bitboard Position::moves_at(Square s, Side p, CaptureTag, DiscTag) const {
