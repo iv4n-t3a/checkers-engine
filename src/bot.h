@@ -20,14 +20,14 @@ typedef MinTag BlackMinMaxTag;
 struct MaxTag {
 	typedef MinTag opposite;
 	static constexpr Side side = WHITE;
-	static constexpr Evaluation worst = std::numeric_limits<Evaluation>::min();
 	static constexpr Evaluation best = std::numeric_limits<Evaluation>::max();
+	static constexpr Evaluation worst = std::numeric_limits<Evaluation>::min();
 };
 struct MinTag {
 	typedef MaxTag opposite;
 	static constexpr Side side = BLACK;
-	static constexpr Evaluation worst = std::numeric_limits<Evaluation>::max();
 	static constexpr Evaluation best = std::numeric_limits<Evaluation>::min();
+	static constexpr Evaluation worst = std::numeric_limits<Evaluation>::max();
 };
 
 struct AlphaBeta {
@@ -49,13 +49,13 @@ private:
 
 	template <typename MinMaxTag> static Evaluation dynamic_evaluate(Position const&, int depth, AlphaBeta);
 
-	static Evaluation best_evaluation(Evaluation, Evaluation, MinTag);
 	static Evaluation best_evaluation(Evaluation, Evaluation, MaxTag);
+	static Evaluation best_evaluation(Evaluation, Evaluation, MinTag);
 
 	static inline std::pair<Position, Evaluation> best_position(
-		std::pair<Position, Evaluation> const&, std::pair<Position, Evaluation> const&, MinTag);
-	static inline std::pair<Position, Evaluation> best_position(
 		std::pair<Position, Evaluation> const&, std::pair<Position, Evaluation> const&, MaxTag);
+	static inline std::pair<Position, Evaluation> best_position(
+		std::pair<Position, Evaluation> const&, std::pair<Position, Evaluation> const&, MinTag);
 
 	static inline Evaluation static_evaluate(Position const&);
 };

@@ -13,10 +13,10 @@ Bot::Bot(Position& b): board(b) {
 }
 
 void Bot::make_move(Side p) {
-	if (p == MinTag::side)
-		make_move<MinTag>();
-	else
+	if (p == MaxTag::side)
 		make_move<MaxTag>();
+	else
+		make_move<MinTag>();
 }
 
 template <typename MinMaxTag>
@@ -64,20 +64,20 @@ Evaluation Bot::dynamic_evaluate(Position const& b, int depth, AlphaBeta ab) {
 	return best;
 }
 
-inline Evaluation Bot::best_evaluation(Evaluation e1, Evaluation e2, MinTag) {
-	return std::min(e1, e2);
-}
 inline Evaluation Bot::best_evaluation(Evaluation e1, Evaluation e2, MaxTag) {
 	return std::max(e1, e2);
 }
-
-inline std::pair<Position, Evaluation> Bot::best_position(
-		std::pair<Position, Evaluation> const& b1, std::pair<Position, Evaluation> const& b2, MinTag) {
-	return b1.second < b2.second ? b1: b2;
+inline Evaluation Bot::best_evaluation(Evaluation e1, Evaluation e2, MinTag) {
+	return std::min(e1, e2);
 }
+
 inline std::pair<Position, Evaluation> Bot::best_position(
 		std::pair<Position, Evaluation> const& b1, std::pair<Position, Evaluation> const& b2, MaxTag) {
 	return b1.second > b2.second ? b1: b2;
+}
+inline std::pair<Position, Evaluation> Bot::best_position(
+		std::pair<Position, Evaluation> const& b1, std::pair<Position, Evaluation> const& b2, MinTag) {
+	return b1.second < b2.second ? b1: b2;
 }
 
 inline Evaluation Bot::static_evaluate(Position const& b) {
@@ -90,13 +90,14 @@ inline Evaluation Bot::static_evaluate(Position const& b) {
 		(bb_popcount(b.get_kings(MaxTag::side)) - bb_popcount(b.get_discs(MinTag::side)))*king_cost;
 }
 
-void inline AlphaBeta::update(Evaluation e, MaxTag) {
-	if (e > alpha)
-		alpha = e;
-}
 void inline AlphaBeta::update(Evaluation e, MinTag) {
 	if (e < beta)
 		beta = e;
+}
+
+void inline AlphaBeta::update(Evaluation e, MaxTag) {
+	if (e > alpha)
+		alpha = e;
 }
 bool inline AlphaBeta::is_expectation_conflict() {
 	return alpha >= beta;
