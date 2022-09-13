@@ -24,7 +24,7 @@ Position::State Position::get_state(Side p) const {
 	return PLAYING;
 }
 bool Position::is_capture_possible(Side p) const {
-	bool r = 0;
+	bool r = false;
 		r |= NE_move(allof[!p] & NE_move(discsof[p])) & ~all;
 		r |= NW_move(allof[!p] & NW_move(discsof[p])) & ~all;
 		r |= SE_move(allof[!p] & SE_move(discsof[p])) & ~all;
@@ -142,16 +142,26 @@ inline void Position::upgrade(Square s, Side p) {
 }
 
 inline bool Position::is_blocked(Side p) const {
+	bool r = false;
 	if (p == WHITE)
-		return
-		not kingsof[p] and
-		not (NE_move(discsof[p]) & ~all) and
-		not (NW_move(discsof[p]) & ~all);
+		r |=
+			not (NE_move(discsof[p]) & ~all) and
+			not (NW_move(discsof[p]) & ~all);
 	else
-		return 
-		not kingsof[p] and
-		not (SE_move(discsof[p]) & ~all) and
-		not (SW_move(discsof[p]) & ~all);
+		r |=
+			not (SE_move(discsof[p]) & ~all) and
+			not (SW_move(discsof[p]) & ~all);
+
+	r &= not (
+		(
+			NE_move(kingsof[p]) |
+			NW_move(kingsof[p]) |
+			SE_move(kingsof[p]) |
+			SW_move(kingsof[p])
+		) & ~all
+	);
+
+	return r;
 }
 
 inline Square Position::get_xray_blocker(Square s, int direction_num) const {
