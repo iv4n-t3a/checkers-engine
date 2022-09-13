@@ -87,7 +87,7 @@ inline Evaluation Bot::static_evaluate(Position const& b) {
 	static constexpr int king_cost = 15;
 	return 
 		 bb_popcount(b.get_discs(MaxTag::side)) - bb_popcount(b.get_discs(MinTag::side)) +
-		(bb_popcount(b.get_kings(MaxTag::side)) - bb_popcount(b.get_discs(MinTag::side)))*king_cost;
+		(bb_popcount(b.get_kings(MaxTag::side)) - bb_popcount(b.get_kings(MinTag::side)))*king_cost;
 }
 
 void inline AlphaBeta::update(Evaluation e, MinTag) {
