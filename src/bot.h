@@ -10,7 +10,6 @@
 #include "position.h"
 
 
-const int DEPTH = 7;
 typedef int Evaluation;
 
 struct MaxTag;
@@ -31,7 +30,7 @@ struct MinTag {
 };
 
 struct AlphaBeta {
-	Evaluation alpha = MaxTag::worst, beta = MaxTag::best;
+	Evaluation alpha = MaxTag::worst, beta = MinTag::worst;
 	void inline update(Evaluation, MaxTag);
 	void inline update(Evaluation, MinTag);
 	bool inline is_expectation_conflict();

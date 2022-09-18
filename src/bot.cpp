@@ -9,6 +9,8 @@
 #include "bot.h"
 
 
+const int DEPTH = 8;
+
 Bot::Bot(Position& b): board(b) {
 }
 
@@ -90,15 +92,13 @@ inline Evaluation Bot::static_evaluate(Position const& b) {
 		(bb_popcount(b.get_kings(MaxTag::side)) - bb_popcount(b.get_kings(MinTag::side)))*king_cost;
 }
 
-void inline AlphaBeta::update(Evaluation e, MinTag) {
-	if (e < beta)
-		beta = e;
-}
 
 void inline AlphaBeta::update(Evaluation e, MaxTag) {
-	if (e > alpha)
-		alpha = e;
+	alpha = std::max(alpha, e);
+}
+void inline AlphaBeta::update(Evaluation e, MinTag) {
+	beta = std::min(beta, e);
 }
 bool inline AlphaBeta::is_expectation_conflict() {
-	return alpha >= beta;
+	return alpha > beta;
 }
