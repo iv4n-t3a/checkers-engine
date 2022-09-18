@@ -60,7 +60,7 @@ void Position::move(Square from, Square to, Side p, CaptureTag, DiscTag) {
 	const Square captured = (from + to)/2;
 
 	set_empty(from, p);
-	set_empty(captured, (Side) !p);
+	set_empty(captured, (Side)!p);
 	set_disc(to, p);
 
 	upgrade_if_nessary(to, p);
@@ -90,10 +90,10 @@ Bitboard Position::moves_at(Square s, Side p, NoncaptureTag, KingTag) const {
 }
 Bitboard Position::moves_at(Square s, Side p, CaptureTag, DiscTag) const {
 	return
-		NE_move(allof[!p] & NE_move(1ull << s)) & ~all |
-		NW_move(allof[!p] & NW_move(1ull << s)) & ~all |
-		SE_move(allof[!p] & SE_move(1ull << s)) & ~all |
-		SW_move(allof[!p] & SW_move(1ull << s)) & ~all;
+		(NE_move(allof[!p] & NE_move(1ull << s)) & ~all) |
+		(NW_move(allof[!p] & NW_move(1ull << s)) & ~all) |
+		(SE_move(allof[!p] & SE_move(1ull << s)) & ~all) |
+		(SW_move(allof[!p] & SW_move(1ull << s)) & ~all);
 }
 Bitboard Position::moves_at(Square s, Side p, CaptureTag, KingTag) const {
 	Bitboard r = 0;
