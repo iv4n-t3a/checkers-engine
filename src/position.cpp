@@ -24,12 +24,12 @@ Position::State Position::get_state(Side p) const {
 	return PLAYING;
 }
 bool Position::is_capture_possible(Side p) const {
-	bool r = false;
-		r |= NE_move(allof[!p] & NE_move(discsof[p])) & ~all;
-		r |= NW_move(allof[!p] & NW_move(discsof[p])) & ~all;
-		r |= SE_move(allof[!p] & SE_move(discsof[p])) & ~all;
-		r |= SW_move(allof[!p] & SW_move(discsof[p])) & ~all;
-	if (r) return true;
+	if (
+		NE_move(allof[!p] & NE_move(discsof[p])) & ~all or
+		NW_move(allof[!p] & NW_move(discsof[p])) & ~all or
+		SE_move(allof[!p] & SE_move(discsof[p])) & ~all or
+		SW_move(allof[!p] & SW_move(discsof[p])) & ~all
+	) return true;
 
 	for (Bb_iterator i(kingsof[p]); i.not_ended(); ++i)
 		if (moves_at(*i, p, CaptureTag(), KingTag())) return true;
@@ -69,7 +69,7 @@ void Position::move(Square from, Square to, Side p, CaptureTag, DiscTag) {
 void Position::move(Square from, Square to, Side p, CaptureTag, KingTag) {
 	const int steps_count = abs(to%8 - from%8);
 	const Direction d = (Direction)((to - from) / steps_count);
-	const Square captured = get_xray_blocker(from, direction_to_num(d));
+	const Square captured = get_xray_blocker(all, from, direction_to_num(d));
 
 	set_empty(from, p);
 	set_empty(captured, (Side) !p);
@@ -82,28 +82,25 @@ Bitboard Position::moves_at(Square s, Side p, NoncaptureTag, DiscTag) const {
 	return disc_moves[p][s] & ~all;
 }
 Bitboard Position::moves_at(Square s, Side p, NoncaptureTag, KingTag) const {
-	Bitboard r = 0;
-	r |= cut_xray(s, 0);
-	r |= cut_xray(s, 1);
-	r |= cut_xray(s, 2);
-	r |= cut_xray(s, 3);
-
-	return r;
+	return
+		cut_xray(all, s, 0) |
+		cut_xray(all, s, 1) |
+		cut_xray(all, s, 2) |
+		cut_xray(all, s, 3);
 }
 Bitboard Position::moves_at(Square s, Side p, CaptureTag, DiscTag) const {
-	Bitboard r = 0;
-		r |= NE_move(allof[!p] & NE_move(1ull << s)) & ~all;
-		r |= NW_move(allof[!p] & NW_move(1ull << s)) & ~all;
-		r |= SE_move(allof[!p] & SE_move(1ull << s)) & ~all;
-		r |= SW_move(allof[!p] & SW_move(1ull << s)) & ~all;
-	return r;
+	return
+		NE_move(allof[!p] & NE_move(1ull << s)) & ~all |
+		NW_move(allof[!p] & NW_move(1ull << s)) & ~all |
+		SE_move(allof[!p] & SE_move(1ull << s)) & ~all |
+		SW_move(allof[!p] & SW_move(1ull << s)) & ~all;
 }
 Bitboard Position::moves_at(Square s, Side p, CaptureTag, KingTag) const {
 	Bitboard r = 0;
 	for (int d_num = 0; d_num < 4; d_num++) {
-		Square blocker = get_xray_blocker(s, d_num);
+		Square blocker = get_xray_blocker(all, s, d_num);
 		if (blocker != NONE_SQUARE and side_at(blocker) != p)
-			r |= cut_xray(blocker, d_num);
+			r |= cut_xray(all, blocker, d_num);
 	}
 	return r;
 }
@@ -143,44 +140,25 @@ inline void Position::upgrade(Square s, Side p) {
 }
 
 inline bool Position::is_blocked(Side p) const {
-	bool r = false;
-	if (p == WHITE)
-		r |=
-			not (NE_move(discsof[p]) & ~all) and
-			not (NW_move(discsof[p]) & ~all);
-	else
-		r |=
-			not (SE_move(discsof[p]) & ~all) and
-			not (SW_move(discsof[p]) & ~all);
-
-	r &= not (
-		(
+	return not (
+		~all & (
+			(p == WHITE ?
+					NE_move(discsof[p]) |
+					NW_move(discsof[p])
+			:
+					SE_move(discsof[p]) |
+					SW_move(discsof[p])
+			) |
 			NE_move(kingsof[p]) |
 			NW_move(kingsof[p]) |
 			SE_move(kingsof[p]) |
 			SW_move(kingsof[p])
-		) & ~all
+		)
 	);
-
-	return r;
 }
 
-inline Square Position::get_xray_blocker(Square s, int direction_num) const {
-	const Bitboard xray = xrays[direction_num][s];
-	const Bitboard blockers = xray & all;
-
-	if (blockers == 0)
-		return NONE_SQUARE;
-
-	return is_bsf_direction[direction_num] ? bsf(blockers): bsr(blockers);
-}
-inline Bitboard Position::cut_xray(Square s, int d_num) const {
-	const Square blocker = get_xray_blocker(s, d_num);
-	return xrays[d_num][s] & ~xrays[d_num][blocker] & ~(1ull << blocker);
-}
-
-KingsPositionHash Position::kings_position_hash() const {
-	return (kingsof[WHITE] >> 1) | kingsof[BLACK];
+KingsPosition Position::get_kings_position() const {
+	return KingsPosition(kingsof);
 }
 
 void Position::set_disc(Square s, Side p) {
@@ -201,11 +179,11 @@ void Position::set_empty(Square s, Side p) {
 }
 
 inline void Position::pass_reversible() {
-	repetition_history.push_reversible_move(kings_position_hash());
+	repetition_history.push_reversible_move(get_kings_position());
 	++king_moves_counter;
 }
 inline void Position::pass_irreversible() {
-	repetition_history.push_irreversible_move(kings_position_hash());
+	repetition_history.push_irreversible_move(get_kings_position());
 	king_moves_counter.drop();
 }
 
@@ -220,10 +198,10 @@ bool KingMovesCounter::is_draw() const {
 	return king_moves_count >= KING_MOVES_LIMIT;
 }
 
-void RepetitionHistory::push_reversible_move(KingsPositionHash h) {
+void RepetitionHistory::push_reversible_move(KingsPosition h) {
 	repetition_history.push_back(h);
 }
-void RepetitionHistory::push_irreversible_move(KingsPositionHash h) {
+void RepetitionHistory::push_irreversible_move(KingsPosition h) {
 	repetition_history = {h};
 }
 bool RepetitionHistory::is_draw() const {
@@ -234,4 +212,14 @@ MovesCount RepetitionHistory::get_repetition_num() const {
 	for (auto i: repetition_history)
 		r += repetition_history.back() == i ? 1: 0;
 	return r;
+}
+
+KingsPosition::KingsPosition(std::array<Bitboard, 2> k) {
+	kings[WHITE] = k[WHITE];
+	kings[BLACK] = k[BLACK];
+}
+bool KingsPosition::operator==(KingsPosition const& other) const {
+	return
+		kings[WHITE] == other.kings[WHITE] and
+		kings[BLACK] == other.kings[BLACK];
 }

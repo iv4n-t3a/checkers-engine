@@ -8,13 +8,21 @@
 #include "types.h"
 #include "bitboard.h"
 
+
+struct KingsPosition {
+	std::array<Bitboard, 2> kings;
+public:
+	KingsPosition(std::array<Bitboard, 2>);
+	bool operator==(KingsPosition const& other) const;
+};
+
 class RepetitionHistory {
 protected:
 	static constexpr MovesCount REPETITION_LIMIT = 3;
-	std::vector<KingsPositionHash> repetition_history;
+	std::vector<KingsPosition> repetition_history;
 public:
-	void push_reversible_move(KingsPositionHash);
-	void push_irreversible_move(KingsPositionHash);
+	void push_reversible_move(KingsPosition);
+	void push_irreversible_move(KingsPosition);
 	bool is_draw() const;
 protected:
 	MovesCount get_repetition_num() const;
@@ -81,10 +89,7 @@ protected:
 
 	inline bool is_blocked(Side p) const;
 
-	inline Square get_xray_blocker(Square, int direction_num) const;
-	inline Bitboard cut_xray(Square, int direction_num) const;
-
-	inline KingsPositionHash kings_position_hash() const;
+	inline KingsPosition get_kings_position() const;
 
 	void set_disc(Square, Side);
 	void set_king(Square, Side);

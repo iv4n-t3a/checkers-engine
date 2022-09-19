@@ -13,7 +13,7 @@ constexpr Square bitscantable[64] = {
 };
 
 Square bsf(Bitboard bb) {
-	return bitscantable[((bb ^ (bb-1)) * 0x03f79d71b4cb0a89) >> 58];
+	return bitscantable[((bb ^ (bb - 1)) * 0x03f79d71b4cb0a89) >> 58];
 }
 Square bsr(Bitboard bb) {
 	bb |= bb >> 1;

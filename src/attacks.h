@@ -41,4 +41,15 @@ constexpr std::array<Map, 2> init_disc_moves() {
 constexpr std::array<Map, 4> xrays = init_xrays();
 constexpr std::array<Map, 2> disc_moves = init_disc_moves();
 
+inline Square get_xray_blocker(Bitboard blockers, Square s, int direction_num) {
+	blockers &= xrays[direction_num][s];
+	if (blockers == 0)
+		return NONE_SQUARE;
+	return is_bsf_direction[direction_num] ? bsf(blockers): bsr(blockers);
+}
+inline Bitboard cut_xray(Bitboard blockers, Square s, int direction_num) {
+	const Square blocker = get_xray_blocker(blockers, s, direction_num);
+	return xrays[direction_num][s] & ~xrays[direction_num][blocker] & ~(1ull << blocker);
+}
+
 #endif // #ifndef ATTACKS
