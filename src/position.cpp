@@ -67,9 +67,7 @@ void Position::move(Square from, Square to, Side p, CaptureTag, DiscTag) {
 	pass_irreversible();
 }
 void Position::move(Square from, Square to, Side p, CaptureTag, KingTag) {
-	const int steps_count = abs(to%8 - from%8);
-	const Direction d = (Direction)((to - from) / steps_count);
-	const Square captured = get_xray_blocker(all, from, direction_to_num(d));
+	const Square captured = get_xray_blocker(all, from, direction_to_num(directions[from][to]));
 
 	set_empty(from, p);
 	set_empty(captured, (Side) !p);

@@ -37,9 +37,19 @@ constexpr std::array<Map, 2> init_disc_moves() {
 	}
 	return r;
 }
-
+constexpr std::array<std::array<Direction, 64>, 64> init_directions() {
+	std::array<std::array<Direction, 64>, 64> r;
+	for (Square from = 0; from < 64; from++)
+		for (Square to = 0; to < 64; to++) {
+			const int steps_count = abs(to%8 - from%8);
+			if (steps_count != 0)
+				r[from][to] = (Direction)((to - from) / steps_count);
+		}
+	return r;
+}
 constexpr std::array<Map, 4> xrays = init_xrays();
 constexpr std::array<Map, 2> disc_moves = init_disc_moves();
+constexpr std::array<std::array<Direction, 64>, 64> directions = init_directions();
 
 inline Square get_xray_blocker(Bitboard blockers, Square s, int direction_num) {
 	blockers &= xrays[direction_num][s];
