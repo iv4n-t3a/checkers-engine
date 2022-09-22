@@ -51,6 +51,8 @@ void Drawer::redraw() {
 
 		if (is_bordered(s))
 			draw_border(s);
+		if (board.is_captured(s))
+			draw_captured(s);
 	}
 
 	for (Square s = 0; s < 64; s++) {
@@ -108,6 +110,9 @@ void Drawer::draw_king(Square s, Side p) {
 }
 void Drawer::draw_border(Square s) {
 	fill_square(s, config::INBORDER_COLOR);
+}
+void Drawer::draw_captured(Square s) {
+	fill_square(s, config::CAPTURED_COLOR);
 }
 void Drawer::draw_white(Square s) {
 	fill_square(s, config::SQUARE_COLOR[WHITE]);

@@ -33,6 +33,7 @@ private:
 	void draw_disc(Square, Side);
 	void draw_king(Square, Side);
 	void draw_border(Square);
+	void draw_captured(Square);
 	void draw_white(Square);
 	void draw_black(Square);
 

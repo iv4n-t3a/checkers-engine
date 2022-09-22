@@ -17,13 +17,13 @@ void Interface::bot_move(Side p) {
 	drawer.redraw();
 }
 void Interface::human_move(Side p) {
-	board.prepare_move(p);
+	board.init_move_cache();
 	display_state(p);
 	if (board.is_capture_possible(p))
 		pick_piece_and_move<CaptureTag>(p);
 	else
 		pick_piece_and_move<NoncaptureTag>(p);
-	board.finish_move();
+	board.pass(p);
 	drawer.redraw();
 }
 

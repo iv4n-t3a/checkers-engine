@@ -39,6 +39,12 @@ public:
 	bool is_draw() const;
 };
 
+struct MoveCache {
+	Bitboard captured;
+	std::bitset<4> king_allowed_directions;
+	bool is_reversible;
+};
+
 class Position {
 public:
 	enum State {
@@ -48,15 +54,6 @@ public:
 		PLAYING
 	};
 protected:
-	struct MoveCache {
-		Side active;
-		Bitboard captured = 0;
-		std::bitset<4> king_allowed_directions = 1111;
-		Position::State state = PLAYING;
-		bool is_capture = false;
-		bool is_reversible = false;
-	};
-
 	Bitboard all = 0;
 	std::array<Bitboard, 2> allof, discsof, kingsof;
 	static constexpr std::array<Bitboard, 2> upgradable = {
@@ -64,15 +61,15 @@ protected:
 		0x0000'0000'0000'00ff  // BLACK
 	};
 
-	MoveCache move_cache;
 	KingMovesCounter king_moves_counter;
 	RepetitionHistory repetition_history;
+	MoveCache move_cache;
 public:
 	Position(Bitboard white_discs = 0x0000'0000'00aa'55aa,
 	      Bitboard black_discs = 0x55aa'5500'0000'0000);
 
-	void prepare_move(Side);
-	void finish_move();
+	void init_move_cache();
+	void pass(Side);
 
 	State get_state(Side) const;
 	bool is_capture_possible(Side) const;
@@ -103,8 +100,6 @@ protected:
 	inline void upgrade(Square, Side);
 
 	inline bool is_blocked(Side) const;
-	inline bool calculate_if_capture_possible(Side) const;
-	inline State calculate_state(Side) const;
 
 	inline KingsPosition get_kings_position() const;
 
@@ -112,10 +107,10 @@ protected:
 	void set_king(Square, Side);
 	void set_empty(Square, Side);
 	void capture(Square);
+	void aply_cached_captures(Side);
 
-	inline void pass_reversible();
-	inline void pass_irreversible();
-
+	inline void remember_reversible();
+	inline void remember_irreversible();
 };
 
 #endif // #ifndef POSITION

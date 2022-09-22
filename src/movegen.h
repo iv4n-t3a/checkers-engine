@@ -15,7 +15,7 @@ private:
 		gen_moves(Position const&, Square, Side, std::vector<Position>&, NoncaptureTag);
 	template <typename PieceTag> static void 
 		gen_moves(Position const&, Square, Side, std::vector<Position>&, CaptureTag );
-	static void push(Position&, std::vector<Position>&);
+	static void push(Position&, Side, std::vector<Position>&);
 };
 
 #endif

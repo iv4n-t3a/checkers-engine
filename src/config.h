@@ -27,6 +27,7 @@ namespace config {
 	};
 	
 	static const sf::Color INBORDER_COLOR = sf::Color(218, 165, 32);
+	static const sf::Color CAPTURED_COLOR = sf::Color::Red;
 	static const sf::Color BACKGROUND_COLOR = sf::Color::Cyan;
 	static const sf::Color TEXT_COLOR = sf::Color::Cyan;
 
