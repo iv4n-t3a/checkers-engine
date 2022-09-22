@@ -5,7 +5,8 @@
 #include "movegen.h"
 
 
-std::vector<Position> MovesGenerator::get_all_aftermove_positions(Position const& b, Side p) {
+std::vector<Position> MovesGenerator::get_all_aftermove_positions(Position b, Side p) {
+	b.prepare_move(p);
 	if (b.is_capture_possible(p))
 		return gen_moves<CaptureTag>(b, p);
 	else
@@ -28,19 +29,26 @@ template <typename P>
 void MovesGenerator::gen_moves(Position const& b, Square s, Side p, std::vector<Position>& v, NoncaptureTag) {
 	for (Bb_iterator i(b.moves_at(s, p, NoncaptureTag(), P())); i.not_ended(); ++i) {
 		Position copy = b;
+		copy.prepare_move(p);
 		copy.move(s, *i, p, NoncaptureTag(), P());
-		v.push_back(copy);
+		push(copy, v);
 	}
-		
 }
 template <typename P>
 void MovesGenerator::gen_moves(Position const& b, Square s, Side p, std::vector<Position>& v, CaptureTag) {
 	for (Bb_iterator i(b.moves_at(s, p, CaptureTag(), P())); i.not_ended(); ++i) {
 		Position copy = b;
+		copy.prepare_move(p);
 		copy.move(s, *i, p, CaptureTag(), P());
 		if (copy.moves_at(*i, p, CaptureTag(), P()))
 			gen_moves<P>(copy, *i, p, v, CaptureTag());
 		else
-			v.push_back(copy);
+			push(copy, v);
 	}
 }
+
+void MovesGenerator::push(Position& b, std::vector<Position>& v) {
+	b.finish_move();
+	v.push_back(b);
+}
+

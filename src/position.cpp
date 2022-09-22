@@ -13,28 +13,26 @@ Position::Position(Bitboard w, Bitboard b) {
 	kingsof = {0, 0};
 }
 
-Position::State Position::get_state(Side p) const {
-	if (king_moves_counter.is_draw())
-		return DRAW;
-	if (repetition_history.is_draw())
-		return DRAW;
-	if (is_blocked(p) and not is_capture_possible(p))
-		return (State) !p;
+void Position::prepare_move(Side p) {
+	move_cache = MoveCache();
+	move_cache.active = p;
+	move_cache.is_capture = calculate_if_capture_possible(p);
+	move_cache.state = calculate_state(p);
+}
+void Position::finish_move() {
+	/*
+	if (move_cache.is_reversible)
+		pass_reversible();
+	else
+		pass_irreversible();
+	*/
+}
 
-	return PLAYING;
+Position::State Position::get_state(Side p) const {
+	return move_cache.state;
 }
 bool Position::is_capture_possible(Side p) const {
-	if (
-		NE_move(allof[!p] & NE_move(discsof[p])) & ~all or
-		NW_move(allof[!p] & NW_move(discsof[p])) & ~all or
-		SE_move(allof[!p] & SE_move(discsof[p])) & ~all or
-		SW_move(allof[!p] & SW_move(discsof[p])) & ~all
-	) return true;
-
-	for (Bb_iterator i(kingsof[p]); i.not_ended(); ++i)
-		if (moves_at(*i, p, CaptureTag(), KingTag())) return true;
-
-	return false;
+	return move_cache.is_capture;
 }
 bool Position::operator==(Position other) const {
 	return 
@@ -127,6 +125,9 @@ Side Position::side_at(Square s) const {
 		return WHITE;
 	return BLACK;
 }
+bool Position::is_captured(Square s) const {
+	return getbit(move_cache.captured, s);
+}
 
 inline void Position::upgrade_if_nessary(Square s, Side p) {
 	if (getbit(upgradable[p], s))
@@ -154,6 +155,29 @@ inline bool Position::is_blocked(Side p) const {
 		)
 	);
 }
+inline bool Position::calculate_if_capture_possible(Side p) const {
+	if (
+		NE_move(allof[!p] & NE_move(discsof[p])) & ~all or
+		NW_move(allof[!p] & NW_move(discsof[p])) & ~all or
+		SE_move(allof[!p] & SE_move(discsof[p])) & ~all or
+		SW_move(allof[!p] & SW_move(discsof[p])) & ~all
+	) return true;
+
+	for (Bb_iterator i(kingsof[p]); i.not_ended(); ++i)
+		if (moves_at(*i, p, CaptureTag(), KingTag())) return true;
+
+	return false;
+}
+inline Position::State Position::calculate_state(Side p) const {
+	if (king_moves_counter.is_draw())
+		return DRAW;
+	if (repetition_history.is_draw())
+		return DRAW;
+	if (is_blocked(p) and not is_capture_possible(p))
+		return (State) !p;
+
+	return PLAYING;
+}
 
 KingsPosition Position::get_kings_position() const {
 	return KingsPosition(kingsof);
@@ -175,10 +199,12 @@ void Position::set_empty(Square s, Side p) {
 	set_0(discsof[p], s);
 	set_0(kingsof[p], s);
 }
+void Position::capture(Square s) {
+	set_1(move_cache.captured, s);
+}
 
 inline void Position::pass_reversible() {
-	repetition_history.push_reversible_move(get_kings_position());
-	++king_moves_counter;
+	repetition_history.push_reversible_move(get_kings_position()); ++king_moves_counter;
 }
 inline void Position::pass_irreversible() {
 	repetition_history.push_irreversible_move(get_kings_position());
