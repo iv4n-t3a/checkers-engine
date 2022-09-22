@@ -83,7 +83,10 @@ inline std::pair<Position, Evaluation> Bot::best_position(
 }
 
 inline Evaluation Bot::static_evaluate(Position const& b) {
-	static constexpr int king_cost = 8;
+	if (b.get_kings(WHITE) and b.get_kings(BLACK))
+		return 0;
+
+	static constexpr int king_cost = 15;
 	return 
 		 bb_popcount(b.get_discs(MaxTag::side)) - bb_popcount(b.get_discs(MinTag::side)) +
 		(bb_popcount(b.get_kings(MaxTag::side)) - bb_popcount(b.get_kings(MinTag::side)))*king_cost;
