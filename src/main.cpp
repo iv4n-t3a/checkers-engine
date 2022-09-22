@@ -56,7 +56,7 @@ void parse_args(int argc, char* argv[]) {
 
 void display_help(char* name) {
 	std::cout <<
-		"usage: " << name << "{white player} {black player}\n" <<
+		"usage: " << name << " {white player} {black player}\n" <<
 		"h - human\n" <<
 		"b - bot\n";
 	std::exit(0);
