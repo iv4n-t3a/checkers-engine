@@ -22,6 +22,7 @@ void Interface::human_move(Side p) {
 		pick_piece_and_move<CaptureTag>(p);
 	else
 		pick_piece_and_move<NoncaptureTag>(p);
+	drawer.redraw();
 }
 
 template <typename M>
@@ -112,6 +113,7 @@ inline void Interface::display_draw() {
 }
 
 inline void Interface::display_end_message(std::string text) {
+	drawer.redraw();
 	std::cout << text << std::endl;
 	std::exit(0);
 }
