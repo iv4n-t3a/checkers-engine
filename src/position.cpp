@@ -15,7 +15,7 @@ Position::Position(Bitboard w, Bitboard b) {
 
 void Position::init_move_cache() {
 	move_cache.captured = 0;
-	move_cache.king_allowed_directions = 1111;
+	move_cache.king_allowed_directions = 0b1111;
 }
 void Position::pass(Side p) {
 	aply_cached_captures(p);
@@ -113,7 +113,7 @@ Bitboard Position::moves_at(Square s, Side p, CaptureTag, KingTag) const {
 	for (int d_num = 0; d_num < 4; d_num++)
 		if (move_cache.king_allowed_directions[d_num]) {
 			Square blocker = get_xray_blocker(all, s, d_num);
-			if (blocker != NONE_SQUARE and getbit(targets, blocker))
+			if (getbit(targets, blocker))
 				r |= cut_xray(all, blocker, d_num);
 		}
 	return r;

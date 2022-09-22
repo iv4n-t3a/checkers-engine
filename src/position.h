@@ -40,7 +40,7 @@ public:
 };
 
 struct MoveCache {
-	Bitboard captured;
+	Bitboard captured = 0;
 	std::bitset<4> king_allowed_directions;
 	bool is_reversible;
 };
