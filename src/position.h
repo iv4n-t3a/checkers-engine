@@ -4,7 +4,6 @@
 #include <unordered_set>
 #include <stack>
 #include <vector>
-#include <bitset>
 
 #include "types.h"
 #include "bitboard.h"
@@ -41,7 +40,6 @@ public:
 
 struct MoveCache {
 	Bitboard captured = 0;
-	std::bitset<4> king_allowed_directions;
 	bool is_reversible;
 };
 

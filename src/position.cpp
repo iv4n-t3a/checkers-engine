@@ -15,7 +15,6 @@ Position::Position(Bitboard w, Bitboard b) {
 
 void Position::init_move_cache() {
 	move_cache.captured = 0;
-	move_cache.king_allowed_directions = 0b1111;
 }
 void Position::pass(Side p) {
 	aply_cached_captures(p);
@@ -78,8 +77,7 @@ void Position::move(Square from, Square to, Side p, CaptureTag, DiscTag) {
 	move_cache.is_reversible = false;
 }
 void Position::move(Square from, Square to, Side p, CaptureTag, KingTag) {
-	int d_num = direction_to_num(directions[from][to]);
-	move_cache.king_allowed_directions = ~(1 << d_num);
+	const uint8_t d_num = direction_to_num(directions[from][to]);
 	const Square captured = get_xray_blocker(all, from, d_num);
 
 	set_empty(from, p);
@@ -110,12 +108,11 @@ Bitboard Position::moves_at(Square s, Side p, CaptureTag, DiscTag) const {
 Bitboard Position::moves_at(Square s, Side p, CaptureTag, KingTag) const {
 	const Bitboard targets = allof[!p] & ~move_cache.captured;
 	Bitboard r = 0;
-	for (int d_num = 0; d_num < 4; d_num++)
-		if (move_cache.king_allowed_directions[d_num]) {
-			Square blocker = get_xray_blocker(all, s, d_num);
-			if (getbit(targets, blocker))
-				r |= cut_xray(all, blocker, d_num);
-		}
+	for (int d_num = 0; d_num < 4; d_num++) {
+		Square blocker = get_xray_blocker(all, s, d_num);
+		if (getbit(targets, blocker))
+			r |= cut_xray(all, blocker, d_num);
+	}
 	return r;
 }
 
