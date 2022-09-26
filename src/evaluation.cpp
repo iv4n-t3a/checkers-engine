@@ -2,17 +2,45 @@
 #include "evaluation.h"
 
 
+Evaluation debut_evaluate(Position const&);
+Evaluation midlegame_evaluate(Position const&);
+Evaluation endgame_evaluate(Position const&);
+
 Evaluation evaluate(Position const& b) {
-	Evaluation e = 0;
+	int count = bb_popcount(b.get_all());
+	if (count >= 18)
+		return debut_evaluate(b);
+	else if (count >= 9)
+		return midlegame_evaluate(b);
+	else
+		return endgame_evaluate(b);
+}
 
-	e += (bb_popcount(b.get_discs(WHITE) & 0x0000'0000'81ff'ffff) - bb_popcount(b.get_discs(BLACK) & 0xffff'ff81'0000'0000)) * 10;
-	e += (bb_popcount(b.get_discs(WHITE) & 0x0000'00ff'7e00'0000) - bb_popcount(b.get_discs(BLACK) & 0x0000'007e'ff00'0000)) * 11;
-	e += (bb_popcount(b.get_discs(WHITE) & 0x0000'ff00'0000'0000) - bb_popcount(b.get_discs(BLACK) & 0x0000'0000'00ff'0000)) * 12;
-	e += (bb_popcount(b.get_discs(WHITE) & 0xffff'0000'0000'0000) - bb_popcount(b.get_discs(BLACK) & 0x0000'0000'0000'ffff)) * 13;
+inline Evaluation debut_evaluate(Position const& b) {
+	return
+		(bb_popcount(b.get_discs(WHITE) & 0x0000'0000'0008'10ff) - bb_popcount(b.get_discs(BLACK) & 0xff08'1000'0000'0000)) * 12 +
+		(bb_popcount(b.get_discs(WHITE) & 0x0000'0000'3c00'0000) - bb_popcount(b.get_discs(BLACK) & 0x0000'003c'0000'0000)) * 11 +
+		(bb_popcount(b.get_discs(WHITE) & 0xffff'ffc3'c33c'ee00) - bb_popcount(b.get_discs(BLACK) & 0x00f7'2cc3'c3ff'ffff)) * 10 +
+		(bb_popcount(b.get_discs(WHITE) & 0x0000'003c'00c3'0100) - bb_popcount(b.get_discs(BLACK) & 0x0080'c300'3c00'0000)) * 9  +
+		(bb_popcount(b.get_kings(WHITE)) - bb_popcount(b.get_kings(BLACK))) * 50;
+}
 
-	e += (bb_popcount(b.get_kings(WHITE) & 0x0000'3c3c'3c3c'0000) - bb_popcount(b.get_kings(BLACK) & 0x0000'3c3c'3c3c'0000)) * 70;
-	e += (bb_popcount(b.get_kings(WHITE) & 0xc3c3'0000'0000'c3c3) - bb_popcount(b.get_kings(BLACK) & 0xc3c3'0000'0000'c3c3)) * 60;
-	e += (bb_popcount(b.get_kings(WHITE) & 0x3c3c'c3c3'c3c3'3c3c) - bb_popcount(b.get_kings(BLACK) & 0x3c3c'c3c3'c3c3'3c3c)) * 50;
+inline Evaluation midlegame_evaluate(Position const& b) {
+	return
+		(bb_popcount(b.get_discs(WHITE) & 0x0000'0000'0008'1008) - bb_popcount(b.get_discs(BLACK) & 0x1008'1000'0000'0000)) * 12 +
+		(bb_popcount(b.get_discs(WHITE) & 0xffff'ff3c'0000'0000) - bb_popcount(b.get_discs(BLACK) & 0x0000'0000'3cff'ffff)) * 11 +
+		(bb_popcount(b.get_discs(WHITE) & 0x0000'00c3'fff7'ee77) - bb_popcount(b.get_discs(BLACK) & 0xee77'efff'c300'0000)) * 10 +
+		(bb_popcount(b.get_discs(WHITE) & 0x0000'0000'0000'0180) - bb_popcount(b.get_discs(BLACK) & 0x0180'0000'0000'0000)) * 9  +
+		(bb_popcount(b.get_kings(WHITE)) - bb_popcount(b.get_kings(BLACK))) * 50;
+}
 
-	return e;
+inline Evaluation endgame_evaluate(Position const& b) {
+	return
+		(bb_popcount(b.get_discs(WHITE) & 0xffff'0000'0000'0000) - bb_popcount(b.get_discs(BLACK) & 0x0000'0000'0000'ffff)) * 12 +
+		(bb_popcount(b.get_discs(WHITE) & 0x0000'ff3c'0000'0000) - bb_popcount(b.get_discs(BLACK) & 0x0000'0000'3cff'0000)) * 11 +
+		(bb_popcount(b.get_discs(WHITE) & 0x0000'00c3'3c00'0000) - bb_popcount(b.get_discs(BLACK) & 0x0000'003c'c300'0000)) * 10 +
+		(bb_popcount(b.get_discs(WHITE) & 0x0000'0000'c3ff'ffff) - bb_popcount(b.get_discs(BLACK) & 0xffff'ffc3'0000'0000)) *  9 +
+
+		(bb_popcount(b.get_kings(WHITE) & 0x41a2'5428'142a'4582) - bb_popcount(b.get_kings(BLACK) & 0x41a2'5428'142a'4582)) * 60 +
+		(bb_popcount(b.get_kings(WHITE) & 0xbe5d'abd7'ebd5'ba7d) - bb_popcount(b.get_kings(BLACK) & 0xbe5d'abd7'ebd5'ba7d)) * 50;
 }

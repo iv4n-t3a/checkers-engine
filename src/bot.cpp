@@ -10,7 +10,7 @@
 #include "bot.h"
 
 
-const int DEPTH = 8;
+const int DEPTH = 11;
 
 Bot::Bot(Position& b): board(b) {
 }
