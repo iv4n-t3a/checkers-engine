@@ -8,7 +8,6 @@
 
 typedef uint64_t Bitboard;
 typedef uint8_t Square;
-typedef uint64_t KingsPositionHash;
 typedef int MovesCount;
 typedef std::array<Bitboard, 65> Map;
 
