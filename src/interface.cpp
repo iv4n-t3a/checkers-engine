@@ -83,7 +83,10 @@ void Interface::finish_capture(Square s, Side p) {
 		do
 			choice = drawer.pick_square();
 		while (choice != s);
-		finish_capture<P>(s, p);
+		if (board.is_disc(s, p))
+			finish_capture<DiscTag>(s, p);
+		else
+			finish_capture<KingTag>(s, p);
 	}
 }
 Square Interface::pick_move(Bitboard moves) {
