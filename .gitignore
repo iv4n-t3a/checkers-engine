@@ -1,3 +1,5 @@
 checkers
 obj
 rec
+build
+.gitignore
