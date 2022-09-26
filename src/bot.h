@@ -8,9 +8,8 @@
 
 #include "types.h"
 #include "position.h"
+#include "evaluation.h"
 
-
-typedef int Evaluation;
 
 struct MaxTag;
 struct MinTag;
