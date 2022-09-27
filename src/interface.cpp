@@ -71,7 +71,13 @@ template <typename P>
 inline void Interface::make_move(Square from, Square to, Side p, CaptureTag) {
 	board.move(from, to, p, CaptureTag(), P());
 	if (board.moves_at(to, p, CaptureTag(), P()))
-		finish_capture<P>(to, p);
+		finish_capture(to, p);
+}
+void Interface::finish_capture(Square s, Side p) {
+	if (board.is_disc(s, p))
+		finish_capture<DiscTag>(s, p);
+	else
+		finish_capture<KingTag>(s, p);
 }
 template <typename P>
 void Interface::finish_capture(Square s, Side p) {
@@ -83,10 +89,7 @@ void Interface::finish_capture(Square s, Side p) {
 		do
 			choice = drawer.pick_square();
 		while (choice != s);
-		if (board.is_disc(s, p))
-			finish_capture<DiscTag>(s, p);
-		else
-			finish_capture<KingTag>(s, p);
+		finish_capture(s, p);
 	}
 }
 Square Interface::pick_move(Bitboard moves) {

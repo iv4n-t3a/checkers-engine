@@ -26,6 +26,7 @@ private:
 
 	template<typename PieceTag> inline void make_move(Square, Square, Side, NoncaptureTag);
 	template<typename PieceTag> inline void make_move(Square, Square, Side, CaptureTag);
+	void finish_capture(Square, Side);
 	template<typename PieceTag> void finish_capture(Square, Side);
 
 	inline Square pick_move(Bitboard moves);
