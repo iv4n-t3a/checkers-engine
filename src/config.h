@@ -8,6 +8,8 @@
 
 
 namespace config {
+	#define IMGDIR "img"
+
 	static const std::array<sf::Color, 2> SQUARE_COLOR = {
 		sf::Color(255, 222, 173),
 		sf::Color(160, 82, 45)
@@ -22,8 +24,8 @@ namespace config {
 	};
 
 	static const std::array<sf::String, 2> KING_TEXTURE_PATH = {
-		"textures/white-king.png",
-		"textures/black-king.png"
+		IMGDIR"/white-king.png",
+		IMGDIR"/black-king.png"
 	};
 	
 	static const sf::Color INBORDER_COLOR = sf::Color(218, 165, 32);
