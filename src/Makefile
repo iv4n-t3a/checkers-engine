@@ -2,6 +2,13 @@ CURDIR := $(shell pwd)
 SOURCES := $(shell find  $(CURDIR) -type f -name '*.$(SRCEXT)')
 OBJECTS := $(patsubst $(CURDIR)/%, $(OBJDIR)/%, $(SOURCES:.$(SRCEXT)=.o))
 
+
+build:
+	@make -C .. build
+
+clean:
+	@make -C .. clean
+
 $(TARGET): $(OBJECTS)
 	@echo "Linking..."
 	$(CXX) $(CPPFLAGS) $^ -o $(TARGET) $(LDFLAGS)
@@ -10,3 +17,5 @@ $(OBJDIR)/%.o: $(CURDIR)/%.$(SRCEXT)
 	@echo "Compiling" $@ "..."
 	@mkdir -p $(OBJDIR)
 	$(CXX) $(CPPFLAGS) -c -o $@ $<
+
+.PHONY: build, clean
