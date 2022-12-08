@@ -8,7 +8,7 @@
 
 
 namespace config {
-	#define IMGDIR "img"
+	#define IMGDIR "etc"
 
 	static const std::array<sf::Color, 2> SQUARE_COLOR = {
 		sf::Color(255, 222, 173),
