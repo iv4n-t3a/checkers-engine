@@ -7,15 +7,15 @@
 #include "movegen.h"
 #include "evaluation.h"
 
-#include "bot.h"
+#include "engine.h"
 
 
 const int DEPTH = 10;
 
-Bot::Bot(Position& b): board(b) {
+Engine::Engine(Position& b): board(b) {
 }
 
-void Bot::make_move(Side p) {
+void Engine::make_move(Side p) {
 	if (p == MaxTag::side)
 		make_move<MaxTag>();
 	else
@@ -23,7 +23,7 @@ void Bot::make_move(Side p) {
 }
 
 template <typename MinMaxTag>
-void Bot::make_move() {
+void Engine::make_move() {
 	AlphaBeta ab;
 	std::vector<Position> positions = MovesGenerator::get_all_aftermove_positions(board, MinMaxTag::side);
 	std::pair<Position, Evaluation> best = {positions[0], MinMaxTag::worst};
@@ -41,7 +41,7 @@ void Bot::make_move() {
 }
 
 template <typename MinMaxTag>
-Evaluation Bot::dynamic_evaluate(Position const& b, int depth, AlphaBeta ab) {
+Evaluation Engine::dynamic_evaluate(Position const& b, int depth, AlphaBeta ab) {
 	switch (b.get_state(MinMaxTag::side)) {
 		case(Position::WHITE_WIN): return WhiteMinMaxTag::best;
 		case(Position::BLACK_WIN): return BlackMinMaxTag::best;
@@ -67,23 +67,23 @@ Evaluation Bot::dynamic_evaluate(Position const& b, int depth, AlphaBeta ab) {
 	return best;
 }
 
-inline Evaluation Bot::best_evaluation(Evaluation e1, Evaluation e2, MaxTag) {
+inline Evaluation Engine::best_evaluation(Evaluation e1, Evaluation e2, MaxTag) {
 	return std::max(e1, e2);
 }
-inline Evaluation Bot::best_evaluation(Evaluation e1, Evaluation e2, MinTag) {
+inline Evaluation Engine::best_evaluation(Evaluation e1, Evaluation e2, MinTag) {
 	return std::min(e1, e2);
 }
 
-inline std::pair<Position, Evaluation> Bot::best_position(
+inline std::pair<Position, Evaluation> Engine::best_position(
 		std::pair<Position, Evaluation> const& b1, std::pair<Position, Evaluation> const& b2, MaxTag) {
 	return b1.second > b2.second ? b1: b2;
 }
-inline std::pair<Position, Evaluation> Bot::best_position(
+inline std::pair<Position, Evaluation> Engine::best_position(
 		std::pair<Position, Evaluation> const& b1, std::pair<Position, Evaluation> const& b2, MinTag) {
 	return b1.second < b2.second ? b1: b2;
 }
 
-inline Evaluation Bot::static_evaluate(Position const& b) {
+inline Evaluation Engine::static_evaluate(Position const& b) {
 	return evaluate(b);
 }
 

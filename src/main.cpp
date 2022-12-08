@@ -3,7 +3,7 @@
 #include "config.h"
 
 #include "position.h"
-#include "bot.h"
+#include "engine.h"
 #include "interface.h"
 
 class Player {
@@ -23,8 +23,8 @@ struct HumanPlayer: public Player {
 		interface->human_move(side);
 	}
 };
-struct BotPlayer: public Player {
-	BotPlayer(Side s): Player(s) {}
+struct EnginePlayer: public Player {
+	EnginePlayer(Side s): Player(s) {}
 	void make_move() override {
 		interface->bot_move(side);
 	}
@@ -37,7 +37,7 @@ std::array<Player*, 2> players;
 void parse_args(int argc, char* argv[]) {
 	if (argc == 1) {
 		players[WHITE] = new HumanPlayer(WHITE);
-		players[BLACK] = new BotPlayer(BLACK);
+		players[BLACK] = new EnginePlayer(BLACK);
 		return;
 	}
 
@@ -48,7 +48,7 @@ void parse_args(int argc, char* argv[]) {
 		if (argv[i+1][0] == 'h')
 			players[i] = new HumanPlayer((Side)i);
 		else if (argv[i+1][0] == 'b')
-			players[i] = new BotPlayer((Side)i);
+			players[i] = new EnginePlayer((Side)i);
 		else
 			display_help(argv[0]);
 	}
@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
 	sf::RenderWindow window;
 	window.create(sf::VideoMode(800, 600), "checkers");
 	Position b;
-	Bot c(b);
+	Engine c(b);
 	Drawer d(window, b);
 	Interface i(b, c, d);
 

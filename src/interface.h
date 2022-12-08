@@ -5,16 +5,16 @@
 
 #include "types.h"
 #include "position.h"
-#include "bot.h"
+#include "engine.h"
 #include "drawer.h"
 
 
 class Interface {
 	Position& board;
-	Bot& bot;
+	Engine& bot;
 	Drawer& drawer;
 public:
-	Interface(Position&, Bot&, Drawer&);
+	Interface(Position&, Engine&, Drawer&);
 	
 	void bot_move(Side);
 	void human_move(Side);

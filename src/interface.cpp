@@ -2,13 +2,13 @@
 
 #include "types.h"
 #include "position.h"
-#include "bot.h"
+#include "engine.h"
 #include "drawer.h"
 
 #include "interface.h"
 
 
-Interface::Interface(Position& b, Bot& c, Drawer& d): board(b), bot(c), drawer(d) {
+Interface::Interface(Position& b, Engine& c, Drawer& d): board(b), bot(c), drawer(d) {
 }
 
 void Interface::bot_move(Side p) {

@@ -1,5 +1,5 @@
-#ifndef BOT
-#define BOT
+#ifndef ENGINE
+#define ENGINE
 
 #include <limits>
 #include <array>
@@ -36,10 +36,10 @@ struct AlphaBeta {
 };
 
 
-class Bot {
+class Engine {
 	Position& board;
 public:
-	Bot(Position&);
+	Engine(Position&);
 	void make_move(Side);
 
 private:
@@ -58,4 +58,4 @@ private:
 	static inline Evaluation static_evaluate(Position const&);
 };
 
-#endif // #ifndef BOT
+#endif // #ifndef ENGINE

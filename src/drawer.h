@@ -9,7 +9,7 @@
 
 #include "types.h"
 #include "position.h"
-#include "bot.h"
+#include "engine.h"
 
 class Drawer {
 	Position const& board;
