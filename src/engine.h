@@ -5,6 +5,7 @@
 #include <array>
 #include <vector>
 #include <tuple>
+#include <unordered_map>
 
 #include "types.h"
 #include "position.h"
@@ -38,14 +39,14 @@ struct AlphaBeta {
 
 class Engine {
 	Position& board;
+	std::array<std::unordered_map<Position, std::pair<Evaluation, int /*depth*/>, PositionHasher>, 2> evaluated;
 public:
 	Engine(Position&);
 	void make_move(Side);
 
 private:
-	template <typename MinMaxTag> void make_move();
-
-	template <typename MinMaxTag> static Evaluation dynamic_evaluate(Position const&, int depth, AlphaBeta);
+	template <typename MinMaxTag> void make_move(Side s);
+	template <typename MinMaxTag> Evaluation dynamic_evaluate(Position const&, int depth, AlphaBeta, Side s);
 
 	static Evaluation best_evaluation(Evaluation, Evaluation, MaxTag);
 	static Evaluation best_evaluation(Evaluation, Evaluation, MinTag);

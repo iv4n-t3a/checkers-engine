@@ -47,12 +47,19 @@ bool Position::is_capture_possible(Side p) const {
 
 	return false;
 }
-bool Position::operator==(Position other) const {
+bool Position::operator==(Position const& other) const {
 	return 
 		discsof[WHITE] == other.discsof[WHITE] and
 		discsof[BLACK] == other.discsof[BLACK] and
 		kingsof[WHITE] == other.kingsof[WHITE] and
 		kingsof[BLACK] == other.kingsof[BLACK];
+}
+uint64_t Position::hash(Position const& p) {
+	return
+		p.discsof[WHITE]*241235214125216341+
+		p.discsof[BLACK]*879730245623523532+
+		p.kingsof[WHITE]*880055355522866634+
+		p.kingsof[BLACK]*314592653589783232;
 }
 
 void Position::move(Square from, Square to, Side p, NoncaptureTag, DiscTag) {

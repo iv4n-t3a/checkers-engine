@@ -10,25 +10,27 @@
 #include "engine.h"
 
 
-const int DEPTH = 10;
+const int DEPTH = 11;
 
 Engine::Engine(Position& b): board(b) {
 }
 
 void Engine::make_move(Side p) {
 	if (p == MaxTag::side)
-		make_move<MaxTag>();
+		make_move<MaxTag>(p);
 	else
-		make_move<MinTag>();
+		make_move<MinTag>(p);
 }
 
 template <typename MinMaxTag>
-void Engine::make_move() {
+void Engine::make_move(Side p) {
 	AlphaBeta ab;
+	evaluated[WHITE].clear();
+	evaluated[BLACK].clear();
 	std::vector<Position> positions = MovesGenerator::get_all_aftermove_positions(board, MinMaxTag::side);
 	std::pair<Position, Evaluation> best = {positions[0], MinMaxTag::worst};
 	for (Position b: positions) {
-		std::pair<Position, Evaluation> processing = {b, dynamic_evaluate<typename MinMaxTag::opposite>(b, DEPTH-1, ab)};
+		std::pair<Position, Evaluation> processing = {b, dynamic_evaluate<typename MinMaxTag::opposite>(b, DEPTH-1, ab, (Side)!p)};
 		best = best_position(best, processing, MinMaxTag());
 		ab.update(best.second, MinMaxTag());
 		if (ab.is_expectation_conflict()) {
@@ -41,7 +43,7 @@ void Engine::make_move() {
 }
 
 template <typename MinMaxTag>
-Evaluation Engine::dynamic_evaluate(Position const& b, int depth, AlphaBeta ab) {
+Evaluation Engine::dynamic_evaluate(Position const& b, int depth, AlphaBeta ab, Side p) {
 	switch (b.get_state(MinMaxTag::side)) {
 		case(Position::WHITE_WIN): return WhiteMinMaxTag::best;
 		case(Position::BLACK_WIN): return BlackMinMaxTag::best;
@@ -50,6 +52,9 @@ Evaluation Engine::dynamic_evaluate(Position const& b, int depth, AlphaBeta ab) 
 	}
 	if (depth == 0)
 		return static_evaluate(b);
+	if (evaluated[p].find(b) != evaluated[p].end() and
+		evaluated[p][b].second >= depth)
+		return evaluated[p][b].first;
 	if (depth == 1 and
 			b.is_capture_possible(MinMaxTag::side))
 			depth++;
@@ -58,7 +63,8 @@ Evaluation Engine::dynamic_evaluate(Position const& b, int depth, AlphaBeta ab) 
 	Evaluation best = MinMaxTag::worst;
 
 	for (Position position: positions) {
-		Evaluation e = dynamic_evaluate<typename MinMaxTag::opposite>(position, depth-1, ab);
+		Evaluation e = dynamic_evaluate<typename MinMaxTag::opposite>(position, depth-1, ab, (Side)!p);
+		evaluated[!p][position] = std::make_pair(e, depth-1);
 		best = best_evaluation(best, e, MinMaxTag());
 		ab.update(best, MinMaxTag());
 		if (ab.is_expectation_conflict())

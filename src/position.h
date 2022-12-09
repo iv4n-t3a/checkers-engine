@@ -71,7 +71,8 @@ public:
 
 	State get_state(Side) const;
 	bool is_capture_possible(Side) const;
-	bool operator==(Position) const;
+	bool operator==(Position const&) const;
+	static uint64_t hash(Position const&);
 
 	void move(Square, Square, Side, NoncaptureTag, DiscTag);
 	void move(Square, Square, Side, NoncaptureTag, KingTag);
@@ -110,5 +111,12 @@ protected:
 	inline void remember_reversible();
 	inline void remember_irreversible();
 };
+
+struct PositionHasher {
+	std::size_t operator()(Position const& p) const {
+		return Position::hash(p);
+	}
+};
+
 
 #endif // #ifndef POSITION
