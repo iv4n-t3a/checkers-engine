@@ -37,12 +37,12 @@ void MovesGenerator::gen_moves(Position const& b, Square s, Side p, std::vector<
 	for (Bb_iterator i(b.moves_at(s, p, CaptureTag(), P())); i.not_ended(); ++i) {
 		Position copy = b;
 		copy.move(s, *i, p, CaptureTag(), P());
-		if (copy.moves_at(*i, p, CaptureTag(), P())) {
-			if (copy.is_disc(*i, p))
-				gen_moves<DiscTag>(copy, *i, p, v, CaptureTag());
-			else
-				gen_moves<KingTag>(copy, *i, p, v, CaptureTag());
-		} else
+
+		if (copy.is_disc(*i, p) and copy.moves_at(*i, p, CaptureTag(), DiscTag()))
+			gen_moves<DiscTag>(copy, *i, p, v, CaptureTag());
+		else if (copy.moves_at(*i, p, CaptureTag(), KingTag()))
+			gen_moves<KingTag>(copy, *i, p, v, CaptureTag());
+		else
 			push(copy, p, v);
 	}
 }
