@@ -40,7 +40,7 @@ void MovesGenerator::gen_moves(Position const& b, Square s, Side p, std::vector<
 
 		if (copy.is_disc(*i, p) and copy.moves_at(*i, p, CaptureTag(), DiscTag()))
 			gen_moves<DiscTag>(copy, *i, p, v, CaptureTag());
-		else if (copy.moves_at(*i, p, CaptureTag(), KingTag()))
+		else if (not copy.is_disc(*i, p) and copy.moves_at(*i, p, CaptureTag(), KingTag()))
 			gen_moves<KingTag>(copy, *i, p, v, CaptureTag());
 		else
 			push(copy, p, v);
