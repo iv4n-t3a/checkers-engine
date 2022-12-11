@@ -8,7 +8,7 @@
 
 
 const Evaluation mobility_k = 20;
-const Evaluation connected_k = 30;
+const Evaluation connected_k = 0;
 const Evaluation passed_k = 30;
 
 inline Evaluation material(Position const&);
@@ -56,10 +56,10 @@ constexpr std::array<std::array<Bitboard, 64>, 2> init_passed_discs_masks() {
 	for (int i = 0; i < 64; i++) {
 		Bitboard white_res = (1ull << i), black_res = (1ull << i);
 		for (int i = 0; i < 8; i++) {
-			white_res |= (white_res & 0x0101'0101'0101'0101) << 7;
-			white_res |= (white_res & 0x8080'8080'8080'8080) << 9;
-			black_res |= (white_res & 0x0101'0101'0101'0101) >> 9;
-			black_res |= (white_res & 0x8080'8080'8080'8080) >> 7;
+			white_res |= NE_move(white_res);
+			white_res |= NW_move(white_res);
+			black_res |= SE_move(black_res);
+			black_res |= SW_move(black_res);
 		}
 		result[WHITE][i] = white_res;
 		result[BLACK][i] = black_res;
