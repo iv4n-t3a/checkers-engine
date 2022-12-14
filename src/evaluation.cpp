@@ -6,49 +6,87 @@
 #include "evaluation.h"
 
 
-
-const Evaluation mobility_k = 20;
-const Evaluation connected_k = 0;
-const Evaluation passed_k = 30;
+constexpr Evaluation material_k = 10000;
+constexpr Evaluation lines_k = 1;
+constexpr Evaluation mobility_k = 20;
+constexpr Evaluation connected_k = 40;
+constexpr Evaluation extreme_k = 0;
+constexpr Evaluation gold_k = 50;
+constexpr Evaluation passed_k = 30;
 
 inline Evaluation material(Position const&);
+inline Evaluation lines(Position const&);
 inline Evaluation mobility(Position const&);
 inline Evaluation connected_discs(Position const&);
+inline Evaluation extreme_discs(Position const&);
 inline Evaluation passed_discs(Position const&);
+inline Evaluation gold_discs(Position const&);
 
 Evaluation evaluate(Position const& b) {
-	return material(b) + 
-		mobility_k*mobility(b) + 
-		passed_k*passed_discs(b) + 
-		connected_k*connected_discs(b);
+	return 
+		material_k * material(b) + 
+		lines_k * lines(b) + 
+		mobility_k * mobility(b) + 
+		passed_k * passed_discs(b) + 
+		connected_k * connected_discs(b) +
+		extreme_k * extreme_discs(b) +
+		gold_k * gold_discs(b);
 }
 
 inline Evaluation material(Position const& b) {
+	return 
+		(bb_popcount(b.get_discs(WHITE)) - bb_popcount(b.get_discs(BLACK))) +
+		(bb_popcount(b.get_kings(WHITE)) - bb_popcount(b.get_kings(BLACK))) * 5;
+}
+
+inline Evaluation lines(Position const& b) {
 	return
-		(bb_popcount(b.get_discs(WHITE) & 0x00ff'0000'0000'0000) - bb_popcount(b.get_discs(BLACK) & 0x0000'0000'0000'ff00)) * 1003 +
-		(bb_popcount(b.get_discs(WHITE) & 0x0000'ff00'0000'0000) - bb_popcount(b.get_discs(BLACK) & 0x0000'003c'00ff'0000)) * 1002 +
-		(bb_popcount(b.get_discs(WHITE) & 0x0000'00ff'0000'0000) - bb_popcount(b.get_discs(BLACK) & 0x0000'0000'ff00'0000)) * 1001 +
-		(bb_popcount(b.get_discs(WHITE) & 0x0000'0000'ff00'0000) - bb_popcount(b.get_discs(BLACK) & 0x0000'00ff'0000'0000)) * 1000 +
-		(bb_popcount(b.get_discs(WHITE) & 0x0000'0000'00ff'0000) - bb_popcount(b.get_discs(BLACK) & 0x0000'ff00'0000'0000)) *  999 +
-		(bb_popcount(b.get_discs(WHITE) & 0x0000'0000'0000'ff00) - bb_popcount(b.get_discs(BLACK) & 0x00ff'0000'0000'0000)) *  998 +
-		(bb_popcount(b.get_discs(WHITE) & 0x0000'0000'0000'00ff) - bb_popcount(b.get_discs(BLACK) & 0xff00'0000'0000'0000)) *  997 +
-		(bb_popcount(b.get_kings(WHITE)) - bb_popcount(b.get_kings(BLACK))) * 5000;
+		  (bb_popcount(b.get_discs(WHITE) & 0x00ff'0000'0000'0000) - bb_popcount(b.get_discs(BLACK) & 0x0000'0000'0000'ff00)) * 3
+		+ (bb_popcount(b.get_discs(WHITE) & 0x0000'ff00'0000'0000) - bb_popcount(b.get_discs(BLACK) & 0x0000'003c'00ff'0000)) * 2
+		+ (bb_popcount(b.get_discs(WHITE) & 0x0000'00ff'0000'0000) - bb_popcount(b.get_discs(BLACK) & 0x0000'0000'ff00'0000)) * 1
+//		+ (bb_popcount(b.get_discs(WHITE) & 0x0000'0000'ff00'0000) - bb_popcount(b.get_discs(BLACK) & 0x0000'00ff'0000'0000)) * 0
+		- (bb_popcount(b.get_discs(WHITE) & 0x0000'0000'00ff'0000) - bb_popcount(b.get_discs(BLACK) & 0x0000'ff00'0000'0000)) * 1
+		- (bb_popcount(b.get_discs(WHITE) & 0x0000'0000'0000'ff00) - bb_popcount(b.get_discs(BLACK) & 0x00ff'0000'0000'0000)) * 2
+		- (bb_popcount(b.get_discs(WHITE) & 0x0000'0000'0000'00ff) - bb_popcount(b.get_discs(BLACK) & 0xff00'0000'0000'0000)) * 3;
 }
 
 inline Evaluation mobility(Position const& b) {
 	return
-		bb_popcount(((b.get_discs(WHITE) & 0x0101'0101'0101'0101) << 7) & ~b.get_all()) +
-		bb_popcount(((b.get_discs(WHITE) & 0x8080'8080'8080'8080) << 9) & ~b.get_all()) -
-		bb_popcount(((b.get_discs(BLACK) & 0x0101'0101'0101'0101) >> 9) & ~b.get_all()) -
-		bb_popcount(((b.get_discs(BLACK) & 0x8080'8080'8080'8080) >> 7) & ~b.get_all());
+		  bb_popcount(NE_move(b.get_discs(WHITE)) & ~b.get_all())
+		+ bb_popcount(NW_move(b.get_discs(WHITE)) & ~b.get_all())
+		- bb_popcount(SE_move(b.get_discs(BLACK)) & ~b.get_all())
+		- bb_popcount(SW_move(b.get_discs(BLACK)) & ~b.get_all());
 }
 
 inline Evaluation connected_discs(Position const& b) {
+	Bitboard extreme_white = b.get_discs(WHITE) & 0x8181'8181'8181'8181;
+	Bitboard extreme_black = b.get_discs(BLACK) & 0x8181'8181'8181'8181;
 	return
-		bb_popcount(((b.get_discs(WHITE) & 0x0101'0101'0101'0101) << 7) & b.get_discs(WHITE)) +
-		bb_popcount(((b.get_discs(WHITE) & 0x8080'8080'8080'8080) << 9) & b.get_discs(WHITE)) -
-		bb_popcount(((b.get_discs(BLACK) & 0x0101'0101'0101'0101) >> 9) & b.get_discs(BLACK)) -
-		bb_popcount(((b.get_discs(BLACK) & 0x8080'8080'8080'8080) >> 7) & b.get_discs(BLACK));
+		bb_popcount(
+			((NE_move(b.get_discs(WHITE)) & b.get_discs(WHITE)) >> NORTH_EAST) &
+			((NW_move(b.get_discs(WHITE)) & b.get_discs(WHITE)) >> NORTH_WEST)
+		) - bb_popcount(
+			((SE_move(b.get_discs(BLACK)) & b.get_discs(BLACK)) << -SOUTH_EAST) &
+			((SW_move(b.get_discs(BLACK)) & b.get_discs(BLACK)) << -SOUTH_WEST)
+		) + bb_popcount(
+			(NE_move(extreme_white) & b.get_discs(WHITE)) |
+			(NW_move(extreme_white) & b.get_discs(WHITE))
+		) - bb_popcount(
+			(NE_move(extreme_black) & b.get_discs(WHITE)) |
+			(NW_move(extreme_black) & b.get_discs(WHITE))
+		);
+}
+
+inline Evaluation extreme_discs(Position const& b) {
+	return
+		bb_popcount(b.get_discs(WHITE) & 0x8181'8181'8181'8181) -
+		bb_popcount(b.get_discs(BLACK) & 0x8181'8181'8181'8181);
+}
+
+inline Evaluation gold_discs(Position const& b) {
+	return
+		bb_popcount(b.get_discs(WHITE) & 0x0000'0000'0018'1818) -
+		bb_popcount(b.get_discs(BLACK) & 0x1818'1800'0000'0000);
 }
 
 constexpr std::array<std::array<Bitboard, 64>, 2> init_passed_discs_masks() {
