@@ -10,7 +10,7 @@
 #include "engine.h"
 
 
-const int DEPTH = 11;
+const int DEPTH = 16;
 
 Engine::Engine(Position& b): board(b) {
 }
