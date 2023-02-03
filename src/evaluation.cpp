@@ -105,6 +105,7 @@ constexpr std::array<std::array<Bitboard, 64>, 2> init_passed_discs_masks() {
 	return result;
 }
 constexpr std::array<std::array<Bitboard, 64>, 2> passed_discs_masks = init_passed_discs_masks();
+
 inline Evaluation passed_discs(Position const& b) {
 	Evaluation count = 0;
 	for (Bb_iterator i = Bb_iterator(b.get_discs(WHITE)); i.not_ended(); ++i)

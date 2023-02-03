@@ -5,7 +5,6 @@
 #include "position.h"
 
 
-
 Position::Position(Bitboard w, Bitboard b) {
 	all = w | b;
 	allof = {w, b};

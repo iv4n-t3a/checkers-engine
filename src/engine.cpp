@@ -10,9 +10,7 @@
 #include "engine.h"
 
 
-const int DEPTH = 16;
-
-Engine::Engine(Position& b): board(b) {
+Engine::Engine(Position& b, int d): board(b), max_depth(d) {
 }
 
 void Engine::make_move(Side p) {
@@ -27,10 +25,10 @@ void Engine::make_move(Side p) {
 	AlphaBeta ab;
 	evaluated[WHITE].clear();
 	evaluated[BLACK].clear();
-	std::vector<Position> positions = MovesGenerator::get_all_aftermove_positions(board, MinMaxTag::side);
+	std::vector<Position> positions = MovesGenerator::generate_next_positions(board, MinMaxTag::side);
 	std::pair<Position, Evaluation> best = {positions[0], MinMaxTag::worst};
 	for (Position b: positions) {
-		std::pair<Position, Evaluation> processing = {b, dynamic_evaluate<typename MinMaxTag::opposite>(b, DEPTH-1, ab, (Side)!p)};
+		std::pair<Position, Evaluation> processing = {b, dynamic_evaluate<typename MinMaxTag::opposite>(b, max_depth-1, ab, (Side)!p)};
 		best = best_position(best, processing, MinMaxTag());
 		ab.update(best.second, MinMaxTag());
 		if (ab.is_expectation_conflict()) {
@@ -59,18 +57,18 @@ Evaluation Engine::dynamic_evaluate(Position const& b, int depth, AlphaBeta ab, 
 			b.is_capture_possible(MinMaxTag::side))
 			depth++;
 
-	std::vector<Position> positions = MovesGenerator::get_all_aftermove_positions(b, MinMaxTag::side);
-	Evaluation best = MinMaxTag::worst;
+	std::vector<Position> positions = MovesGenerator::generate_next_positions(b, MinMaxTag::side);
+	Evaluation best_found = MinMaxTag::worst;
 
 	for (Position position: positions) {
 		Evaluation e = dynamic_evaluate<typename MinMaxTag::opposite>(position, depth-1, ab, (Side)!p);
 		evaluated[!p][position] = std::make_pair(e, depth-1);
-		best = best_evaluation(best, e, MinMaxTag());
-		ab.update(best, MinMaxTag());
+		best_found = best_evaluation(best_found, e, MinMaxTag());
+		ab.update(best_found, MinMaxTag());
 		if (ab.is_expectation_conflict())
-			return best;
+			return best_found;
 	}
-	return best;
+	return best_found;
 }
 
 inline Evaluation Engine::best_evaluation(Evaluation e1, Evaluation e2, MaxTag) {

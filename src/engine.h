@@ -40,8 +40,9 @@ struct AlphaBeta {
 class Engine {
 	Position& board;
 	std::array<std::unordered_map<Position, std::pair<Evaluation, int /*depth*/>, PositionHasher>, 2> evaluated;
+    int max_depth;
 public:
-	Engine(Position&);
+	Engine(Position&, int max_depth);
 	void make_move(Side);
 
 private:

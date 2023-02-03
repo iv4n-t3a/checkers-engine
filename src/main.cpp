@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
 	sf::RenderWindow window;
 	window.create(sf::VideoMode(800, 600), "checkers");
 	Position b;
-	Engine c(b);
+	Engine c(b, 16);
 	Drawer d(window, b);
 	Gui i(b, c, d);
 

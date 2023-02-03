@@ -118,5 +118,4 @@ struct PositionHasher {
 	}
 };
 
-
 #endif // #ifndef POSITION
