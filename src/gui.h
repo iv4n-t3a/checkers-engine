@@ -9,12 +9,12 @@
 #include "drawer.h"
 
 
-class Interface {
+class Gui {
 	Position& board;
 	Engine& bot;
 	Drawer& drawer;
 public:
-	Interface(Position&, Engine&, Drawer&);
+	Gui(Position&, Engine&, Drawer&);
 	
 	void bot_move(Side);
 	void human_move(Side);
