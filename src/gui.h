@@ -15,7 +15,7 @@ class Gui {
 	Drawer& drawer;
 public:
 	Gui(Position&, Engine&, Drawer&);
-	
+
 	void bot_move(Side);
 	void human_move(Side);
 private:

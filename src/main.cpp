@@ -6,6 +6,8 @@
 #include "engine.h"
 #include "drawer.h"
 #include "gui.h"
+#include "argparser.h"
+
 
 class Player {
 protected:
@@ -31,31 +33,10 @@ struct EnginePlayer: public Player {
 	}
 };
 
-
-void display_help(char* name);
+void display_help_and_exit(char* name);
 std::array<Player*, 2> players;
 
-void parse_args(int argc, char* argv[]) {
-	if (argc == 1) {
-		players[WHITE] = new HumanPlayer(WHITE);
-		players[BLACK] = new EnginePlayer(BLACK);
-		return;
-	}
-
-	if (argc != 3)
-		display_help(argv[0]);
-
-	for (int i = 0; i < 2; i++) {
-		if (argv[i+1][0] == 'h')
-			players[i] = new HumanPlayer((Side)i);
-		else if (argv[i+1][0] == 'b')
-			players[i] = new EnginePlayer((Side)i);
-		else
-			display_help(argv[0]);
-	}
-}
-
-void display_help(char* name) {
+void display_help_and_exit(char* name) {
 	std::cout <<
 		"usage: " << name << " {white player} {black player}\n" <<
 		"h - human\n" <<
@@ -64,11 +45,20 @@ void display_help(char* name) {
 }
 
 int main(int argc, char *argv[]) {
-	parse_args(argc, argv);
+	Config cfg;
+	try {
+		cfg = generate_config(argc, argv);
+	} catch (ParsingException) {
+		display_help_and_exit(argv[0]);
+	}
+
+	players[WHITE] = cfg.players[WHITE] == HUMAN ? (Player*) new HumanPlayer(WHITE) : (Player*) new EnginePlayer(WHITE);
+	players[BLACK] = cfg.players[BLACK] == HUMAN ? (Player*) new HumanPlayer(BLACK) : (Player*) new EnginePlayer(BLACK);
+
 	sf::RenderWindow window;
 	window.create(sf::VideoMode(800, 600), "checkers");
 	Position b;
-	Engine c(b, 16);
+	Engine c(b, cfg.depth);
 	Drawer d(window, b);
 	Gui i(b, c, d);
 
