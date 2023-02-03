@@ -10,14 +10,17 @@
 #include "types.h"
 #include "position.h"
 #include "engine.h"
+#include "config.h"
+
 
 class Drawer {
 	Position const& board;
 	sf::RenderWindow& window;
 	int square_size;
 	Bitboard bordered = 0;
+	Config cfg;
 public:
-	Drawer(sf::RenderWindow&, Position const&);
+	Drawer(sf::RenderWindow&, Position const&, Config c);
 
 	void border(Square);
 	void border(Bitboard);

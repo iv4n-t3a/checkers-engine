@@ -1,12 +1,10 @@
 #include <SFML/Graphics.hpp>
 
-#include "config.h"
-
 #include "position.h"
 #include "engine.h"
 #include "drawer.h"
 #include "gui.h"
-#include "argparser.h"
+#include "config.h"
 
 
 class Player {
@@ -38,9 +36,16 @@ std::array<Player*, 2> players;
 
 void display_help_and_exit(char* name) {
 	std::cout <<
-		"usage: " << name << " {white player} {black player}\n" <<
-		"h - human\n" <<
-		"b - bot\n";
+		"Usage: " << name << " <options> {white player} {black player}\n" <<
+		"	h - human\n" <<
+		"	b - bot\n" <<
+		"Options:\n" <<
+		"	-d or --depth - engine analise depth\n" <<
+		"	-p or --prgram-dir - program files directory\n" <<
+		"	-w or --wigth - window wigth\n" <<
+		"	-h or --height - window height\n" <<
+		"	-? or --help - show this message\n" <<
+		"\n";
 	std::exit(0);
 }
 
@@ -56,10 +61,10 @@ int main(int argc, char *argv[]) {
 	players[BLACK] = cfg.players[BLACK] == HUMAN ? (Player*) new HumanPlayer(BLACK) : (Player*) new EnginePlayer(BLACK);
 
 	sf::RenderWindow window;
-	window.create(sf::VideoMode(800, 600), "checkers");
+	window.create(sf::VideoMode(cfg.wight, cfg.height), "Checkers");
 	Position b;
 	Engine c(b, cfg.depth);
-	Drawer d(window, b);
+	Drawer d(window, b, cfg);
 	Gui i(b, c, d);
 
 	players[WHITE]->set_gui(&i);

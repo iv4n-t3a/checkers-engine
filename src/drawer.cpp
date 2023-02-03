@@ -10,7 +10,7 @@
 #include "drawer.h"
 
 
-Drawer::Drawer(sf::RenderWindow& w, Position const& b): window(w), board(b) {
+Drawer::Drawer(sf::RenderWindow& w, Position const& b, Config c): window(w), board(b), cfg(c) {
 	sf::Vector2u size = window.getSize();
 	square_size = std::min(size.x, size.y) / 8;
 	redraw();
@@ -41,7 +41,7 @@ Square Drawer::pick_square() {
 
 
 void Drawer::redraw() {
-	window.clear(config::BACKGROUND_COLOR);
+	window.clear(cfg.background_color);
 	for (Square s = 0; s < 64; s++) {
 		constexpr Bitboard WHITE = 0xaa55'aa55'aa55'aa55;
 		if (getbit(WHITE, s))
@@ -95,30 +95,30 @@ bool Drawer::is_bordered(Square s) const {
 
 void Drawer::draw_disc(Square s, Side p) {
 	sf::CircleShape disc(square_size / 2);
-	disc.setFillColor(config::PIECE_COLOR[p]);
+	disc.setFillColor(cfg.piece_color[p]);
 	disc.setOutlineThickness(1.5);
-	disc.setOutlineColor(config::PIECE_OUTLINE_COLOR[p]);
+	disc.setOutlineColor(cfg.piece_outline_color[p]);
 	draw_shape(s, &disc);
 }
 void Drawer::draw_king(Square s, Side p) {
 	sf::CircleShape king(square_size / 2);
 	king.setOutlineThickness(1.5);
-	king.setOutlineColor(config::PIECE_OUTLINE_COLOR[p]);
-	const sf::Texture* texture = &config::KING_TEXTURE[p];
+	king.setOutlineColor(cfg.piece_outline_color[p]);
+	const sf::Texture* texture = &cfg.king_texture[p];
 	king.setTexture(texture);
 	draw_shape(s, &king);
 }
 void Drawer::draw_border(Square s) {
-	fill_square(s, config::INBORDER_COLOR);
+	fill_square(s, cfg.inbordered_color);
 }
 void Drawer::draw_captured(Square s) {
-	fill_square(s, config::CAPTURED_COLOR);
+	fill_square(s, cfg.captured_color);
 }
 void Drawer::draw_white(Square s) {
-	fill_square(s, config::SQUARE_COLOR[WHITE]);
+	fill_square(s, cfg.square_color[WHITE]);
 }
 void Drawer::draw_black(Square s) {
-	fill_square(s, config::SQUARE_COLOR[BLACK]);
+	fill_square(s, cfg.square_color[BLACK]);
 }
 
 inline void Drawer::fill_square(Square s, sf::Color c) {
