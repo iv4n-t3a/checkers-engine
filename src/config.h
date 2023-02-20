@@ -32,7 +32,7 @@ struct Config {
 			captured_color,
 			background_color,
 			text_color;
-	std::array<sf::String, 2> king_texture_path;
+	std::array<std::string, 2> king_texture_path;
 	std::array<sf::Texture, 2> king_texture;
 };
 

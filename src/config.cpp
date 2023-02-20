@@ -19,14 +19,14 @@ inline PlayerType player_type(char l) {
 Config generate_default_config() {
 	Config c;
 
-	c.depth = 13;
+	c.depth = 12;
 	c.wight = 600;
 	c.height = 800;
 
 	c.etcdir = "/home/ivan/Projects/checkers/etc/";
 	c.square_color = {
-		sf::Color(255, 222, 173),
-		sf::Color(160, 82, 45)
+		sf::Color(238, 238, 210),
+		sf::Color(118, 150, 86)
 	};
 	c.piece_color = {
 		sf::Color(255, 255, 255),
@@ -37,12 +37,12 @@ Config generate_default_config() {
 		sf::Color(255, 255, 255)
 	};
 	c.king_texture_path = {
-		"white-king.png",
-		"black-king.png"
+		c.etcdir+"white-king.png",
+		c.etcdir+"black-king.png"
 	};
-	c.inbordered_color = sf::Color(218, 165, 32);
-	c.captured_color = sf::Color::Red;
-	c.background_color = sf::Color::Cyan;
+	c.inbordered_color = sf::Color(186, 202, 68);
+	c.captured_color = sf::Color(186, 202, 68);
+	c.background_color = sf::Color(33, 32, 47);
 	c.text_color = sf::Color::Cyan;
 
 	return c;
@@ -70,18 +70,15 @@ Config generate_config(int argc, char *argv[]) {
 			throw FORMATERR;
 	}
 
+	c.king_texture[WHITE].loadFromFile(sf::String(c.king_texture_path[WHITE]));
+	c.king_texture[BLACK].loadFromFile(c.king_texture_path[BLACK]);
+
 	if (argc - i == 0) {
 		c.players[WHITE] = HUMAN;
 		c.players[BLACK] = ENGINE;
-		return c;
 	} else {
 		c.players[WHITE] = player_type(argv[i + 0][0]);
 		c.players[BLACK] = player_type(argv[i + 1][0]);
 	}
-
-	if (c.king_texture_path[WHITE][0] != '/') c.king_texture_path[WHITE] = c.etcdir + c.king_texture_path[WHITE];
-	if (c.king_texture_path[BLACK][0] != '/') c.king_texture_path[BLACK] = c.etcdir + c.king_texture_path[BLACK];
-	c.king_texture[WHITE].loadFromFile(c.king_texture_path[WHITE]);
-	c.king_texture[BLACK].loadFromFile(c.king_texture_path[BLACK]);
 	return c;
 }
