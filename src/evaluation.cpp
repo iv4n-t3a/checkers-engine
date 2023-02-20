@@ -8,9 +8,9 @@
 
 constexpr Evaluation material_k = 10000;
 constexpr Evaluation lines_k = 1;
-constexpr Evaluation mobility_k = 20;
-constexpr Evaluation connected_k = 40;
-constexpr Evaluation extreme_k = 0;
+constexpr Evaluation mobility_k = 40;
+constexpr Evaluation connected_k = 20;
+constexpr Evaluation extreme_k = -2;
 constexpr Evaluation gold_k = 50;
 constexpr Evaluation passed_k = 30;
 
