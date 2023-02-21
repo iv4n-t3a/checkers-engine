@@ -41,7 +41,6 @@ Config generate_default_config() {
 		c.etcdir+"black-king.png"
 	};
 	c.inbordered_color = sf::Color(186, 202, 68);
-	c.captured_color = sf::Color(186, 202, 68);
 	c.background_color = sf::Color(33, 32, 47);
 	c.text_color = sf::Color::Cyan;
 

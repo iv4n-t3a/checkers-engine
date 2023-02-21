@@ -134,6 +134,9 @@ Bitboard Position::get_discs(Side p) const {
 Bitboard Position::get_kings(Side p) const {
 	return kingsof[p];
 }
+Bitboard Position::get_captured() const {
+	return move_cache.captured;
+}
 
 bool Position::is_empty(Square s) const {
 	return not getbit(all, s);
@@ -145,9 +148,6 @@ Side Position::side_at(Square s) const {
 	if (getbit(allof[WHITE], s)) 
 		return WHITE;
 	return BLACK;
-}
-bool Position::is_captured(Square s) const {
-	return getbit(move_cache.captured, s);
 }
 
 inline void Position::upgrade_if_nessary(Square s, Side p) {

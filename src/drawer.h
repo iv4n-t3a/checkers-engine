@@ -24,6 +24,8 @@ public:
 
 	void border(Square);
 	void border(Bitboard);
+	void border_diff();
+	void border_captured();
 	void unborder_all();
 
 	Square pick_square();
@@ -36,7 +38,6 @@ private:
 	void draw_disc(Square, Side);
 	void draw_king(Square, Side);
 	void draw_border(Square);
-	void draw_captured(Square);
 	void draw_white(Square);
 	void draw_black(Square);
 

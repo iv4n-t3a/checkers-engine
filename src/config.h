@@ -29,7 +29,6 @@ struct Config {
 			piece_outline_color;
 	sf::Color 
 			inbordered_color,
-			captured_color,
 			background_color,
 			text_color;
 	std::array<std::string, 2> king_texture_path;

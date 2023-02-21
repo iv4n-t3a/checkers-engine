@@ -24,6 +24,15 @@ void Drawer::border(Bitboard bb) {
 	bordered |= bb;
 	redraw();
 }
+Bitboard previous_all = 0;
+void Drawer::border_diff() {
+	if (previous_all and previous_all ^ board.get_all())
+		bordered |= previous_all ^ board.get_all();
+	previous_all = board.get_all();
+}
+void Drawer::border_captured() {
+	bordered |= board.get_captured();
+}
 void Drawer::unborder_all() {
 	bordered = 0;
 	redraw();
@@ -39,9 +48,9 @@ Square Drawer::pick_square() {
 	return choice;
 }
 
-
 void Drawer::redraw() {
 	window.clear(cfg.background_color);
+
 	for (Square s = 0; s < 64; s++) {
 		constexpr Bitboard WHITE = 0xaa55'aa55'aa55'aa55;
 		if (getbit(WHITE, s))
@@ -51,8 +60,6 @@ void Drawer::redraw() {
 
 		if (is_bordered(s))
 			draw_border(s);
-		if (board.is_captured(s))
-			draw_captured(s);
 	}
 
 	for (Square s = 0; s < 64; s++) {
@@ -110,9 +117,6 @@ void Drawer::draw_king(Square s, Side p) {
 }
 void Drawer::draw_border(Square s) {
 	fill_square(s, cfg.inbordered_color);
-}
-void Drawer::draw_captured(Square s) {
-	fill_square(s, cfg.captured_color);
 }
 void Drawer::draw_white(Square s) {
 	fill_square(s, cfg.square_color[WHITE]);

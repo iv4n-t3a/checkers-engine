@@ -88,12 +88,11 @@ public:
 	Bitboard get_all(Side) const;
 	Bitboard get_discs(Side) const;
 	Bitboard get_kings(Side) const;
+	Bitboard get_captured() const;
 
 	bool is_empty(Square) const;
 	bool is_disc(Square, Side) const;
 	Side side_at(Square) const;
-	bool is_captured(Square) const;
-
 protected:
 	inline void upgrade_if_nessary(Square, Side);
 	inline void upgrade(Square, Side);
