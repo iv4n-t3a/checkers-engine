@@ -9,15 +9,15 @@ BLACKWIN="Black win!
 
 while true
 do
-	SIDE=$(zenity --question $ZENITYFLAGS --text "Play for white? (no to play black)"; echo $?)
+	SIDE=$(zenity --question $ZENITYFLAGS --text "Play for white?"; echo $?)
 
 	case $SIDE in
 		0)
-			GAME_RESULT=$(./checkers $GAMEFLAGS b b)
+			GAME_RESULT=$(./checkers $GAMEFLAGS h b)
 			SIDE="WHITE"
 			;;
 		1)
-			GAME_RESULT=$(./checkers $GAMEFLAGS b b)
+			GAME_RESULT=$(./checkers $GAMEFLAGS b h)
 			SIDE="BLACK"
 			;;
 	esac
