@@ -2,10 +2,6 @@
 
 GAMEFLAGS="--depth 1"
 ZENITYFLAGS="--width 200 --height 100"
-WHITEWIN="White win!
-"
-BLACKWIN="Black win!
-"
 
 while true
 do
@@ -28,5 +24,6 @@ do
 	then
 		exit
 	fi
-done
 
+	clear
+done
