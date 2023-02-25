@@ -23,9 +23,9 @@ void Gui::human_move(Side p) {
 	board.init_move_cache();
 	exit_if_end(p);
 	if (board.is_capture_possible(p))
-		pick_move<CaptureTag>(p);
+		pick_move(p, CaptureTag());
 	else
-		pick_move<NoncaptureTag>(p);
+		pick_move(p, NoncaptureTag());
 	board.pass(p);
 
 	drawer.unborder_all();
@@ -34,48 +34,55 @@ void Gui::human_move(Side p) {
 }
 
 template <typename M>
-void Gui::pick_move(Side p) {
+void Gui::pick_move(Side p, M) {
 	Square s;
 	do
 		s = drawer.pick_square();
 	while (s == NONE_SQUARE);
 
-	pick_move<M> (s, p);
+	pick_move(s, p, M());
 }
 template <typename M>
-void Gui::pick_move(Square s, Side p) {
+void Gui::pick_move(Square s, Side p, M) {
 	if (board.is_empty(s)) {
-		pick_move<M>(p);
+		pick_move(p, M());
 		return;
 	}
 
 	if (board.is_disc(s, p))
-		pick_move<M, DiscTag>(s, p);
+		pick_move(s, p, M(), DiscTag());
 	else
-		pick_move<M, KingTag>(s, p);
+		pick_move(s, p, M(), KingTag());
 }
 template <typename M, typename P>
-void Gui::pick_move(Square s, Side p) {
-	if (not is_movable(s, p)) {
-		pick_move<M>(p);
+void Gui::pick_move(Square s, Side p, M, P) {
+	if (not is_piece(s, p)) {
+		pick_move(p, M());
 		return;
 	}
 
 	Bitboard moves = board.moves_at(s, p, M(), P());
+
+	if (not moves) {
+		border_movable(p, M());
+		pick_move(p, M());
+		return;
+	}
+
 	Square choice = pick_square(moves);
 
 	if (getbit(moves, choice))
-		make_move<P>(s, choice, p, M());
+		make_move(s, choice, p, M(), P());
 	else
-		pick_move<M>(choice, p);
+		pick_move(choice, p, M());
 }
 
 template <typename P>
-inline void Gui::make_move(Square from, Square to, Side p, NoncaptureTag) {
+inline void Gui::make_move(Square from, Square to, Side p, NoncaptureTag, P) {
 	board.move(from, to, p, NoncaptureTag(), P());
 }
 template <typename P>
-inline void Gui::make_move(Square from, Square to, Side p, CaptureTag) {
+inline void Gui::make_move(Square from, Square to, Side p, CaptureTag, P) {
 	board.move(from, to, p, CaptureTag(), P());
 	if (board.moves_at(to, p, CaptureTag(), P()))
 		finish_capture(to, p);
@@ -85,21 +92,23 @@ void Gui::finish_capture(Square s, Side p) {
 	drawer.border_captured();
 
 	if (board.is_disc(s, p))
-		finish_capture<DiscTag>(s, p);
+		finish_capture(s, p, DiscTag());
 	else
-		finish_capture<KingTag>(s, p);
+		finish_capture(s, p, KingTag());
 }
 template <typename P>
-void Gui::finish_capture(Square s, Side p) {
+void Gui::finish_capture(Square s, Side p, P) {
 	Bitboard moves = board.moves_at(s, p, CaptureTag(), P());
 	Square choice = pick_square(moves);
 	if (getbit(moves, choice))
-		make_move<P>(s, choice, p, CaptureTag());
+		make_move(s, choice, p, CaptureTag(), P());
 	else {
-		do
+		do {
+			drawer.border_captured();
+			drawer.border(moves);
 			choice = drawer.pick_square();
-		while (choice != s);
-		finish_capture(s, p);
+		} while (not getbit(moves, choice));
+		make_move(s, choice, p, CaptureTag(), P());
 	}
 }
 
@@ -108,7 +117,25 @@ Square Gui::pick_square(Bitboard to_pick) {
 	Square choice = drawer.pick_square();
 	return choice;
 }
-inline bool Gui::is_movable(Square s, Side p) const {
+template <typename M>
+inline void Gui::border_movable(Side p, M) {
+	drawer.unborder_all();
+	for (Square i = 0; i < 64; i++) {
+		if (not is_piece(i, p)) 
+			continue;
+		if (is_movable(i, p, M()))
+			drawer.border(i);
+	}
+}
+template <typename M>
+inline bool Gui::is_movable(Square s, Side p, M) const {
+	if (board.is_disc(s, p))
+		return board.moves_at(s, p, M(), DiscTag());
+	else
+		return board.moves_at(s, p, M(), KingTag());
+		
+}
+inline bool Gui::is_piece(Square s, Side p) const {
 	return s != NONE_SQUARE and not board.is_empty(s) and board.side_at(s) == p;
 }
 
