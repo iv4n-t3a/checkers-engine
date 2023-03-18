@@ -1,6 +1,6 @@
 # !/bin/sh
 
-GAMEFLAGS="--depth 1"
+GAMEFLAGS="--depth 12"
 ZENITYFLAGS="--width 200 --height 100"
 
 while true
