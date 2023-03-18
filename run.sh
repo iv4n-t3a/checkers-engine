@@ -9,11 +9,11 @@ do
 
 	case $SIDE in
 		0)
-			GAME_RESULT=$(./checkers $GAMEFLAGS h b)
+			GAME_RESULT=$(./checkers_nd $GAMEFLAGS h b)
 			SIDE="WHITE"
 			;;
 		1)
-			GAME_RESULT=$(./checkers $GAMEFLAGS b h)
+			GAME_RESULT=$(./checkers_nd $GAMEFLAGS b h)
 			SIDE="BLACK"
 			;;
 	esac
