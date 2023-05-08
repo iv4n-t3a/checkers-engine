@@ -47,7 +47,7 @@ bool Position::is_capture_possible(Side p) const {
 	return false;
 }
 bool Position::operator==(Position const& other) const {
-	return 
+	return
 		discsof[WHITE] == other.discsof[WHITE] and
 		discsof[BLACK] == other.discsof[BLACK] and
 		kingsof[WHITE] == other.kingsof[WHITE] and
@@ -145,7 +145,7 @@ bool Position::is_disc(Square s, Side p) const {
 	return getbit(discsof[p], s);
 }
 Side Position::side_at(Square s) const {
-	if (getbit(allof[WHITE], s)) 
+	if (getbit(allof[WHITE], s))
 		return WHITE;
 	return BLACK;
 }

@@ -71,7 +71,7 @@ void Drawer::redraw() {
 			draw_disc(s, p);
 		else
 			draw_king(s, p);
-	}	
+	}
 	window.display();
 }
 Square Drawer::wait_mouse_click() {

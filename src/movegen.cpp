@@ -24,7 +24,7 @@ std::vector<Position> MovesGenerator::generate_next_positions(Position const& b,
 	return res;
 }
 
-template <typename P> 
+template <typename P>
 void MovesGenerator::generate_next_positions(Position const& b, Square s, Side p, std::vector<Position>& v, NoncaptureTag) {
 	for (Bb_iterator i(b.moves_at(s, p, NoncaptureTag(), P())); i.not_ended(); ++i) {
 		Position copy = b;

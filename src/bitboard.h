@@ -13,7 +13,7 @@ constexpr void set_0(Bitboard& bb, Square s) {
 	bb &= ~(1ull << s);
 }
 constexpr bool getbit(Bitboard bb, Square s) {
-	return bb & (1ull << s);	
+	return bb & (1ull << s);
 }
 
 inline uint8_t bb_popcount(Bitboard bb) {

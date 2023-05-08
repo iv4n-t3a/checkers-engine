@@ -1,5 +1,5 @@
 CXX := g++
-CPPFLAGS := -g -Wall -std=c++20 -O3 -flto
+CPPFLAGS := -g -Wall -std=c++20 -O2 -flto
 LIBS :=  -lsfml-graphics -lsfml-window -lsfml-system
 LDFLAGS := $(LIBS)
 SRCEXT := cpp

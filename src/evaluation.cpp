@@ -23,18 +23,18 @@ inline Evaluation passed_discs(Position const&);
 inline Evaluation gold_discs(Position const&);
 
 Evaluation evaluate(Position const& b) {
-	return 
-		material_k * material(b) + 
-		lines_k * lines(b) + 
-		mobility_k * mobility(b) + 
-		passed_k * passed_discs(b) + 
+	return
+		material_k * material(b) +
+		lines_k * lines(b) +
+		mobility_k * mobility(b) +
+		passed_k * passed_discs(b) +
 		connected_k * connected_discs(b) +
 		extreme_k * extreme_discs(b) +
 		gold_k * gold_discs(b);
 }
 
 inline Evaluation material(Position const& b) {
-	return 
+	return
 		(bb_popcount(b.get_discs(WHITE)) - bb_popcount(b.get_discs(BLACK))) +
 		(bb_popcount(b.get_kings(WHITE)) - bb_popcount(b.get_kings(BLACK))) * 5;
 }

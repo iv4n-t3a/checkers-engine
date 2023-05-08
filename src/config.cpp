@@ -53,7 +53,7 @@ Config generate_config(int argc, char *argv[]) {
 	for (; i < argc; i++) {
 		if (argv[i][0] != '-')
 			break;
-		
+
 		std::string arg = argv[i];
 		if (arg == "-d" or arg == "--depth")
 			c.depth = atoi(argv[++i]);

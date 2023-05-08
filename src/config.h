@@ -18,7 +18,7 @@ enum ParsingException {
 };
 struct Config {
 	std::array<PlayerType, 2> players;
-    int 
+    int
 		depth,
 		wight,
 		height;
@@ -27,7 +27,7 @@ struct Config {
 			square_color,
 			piece_color,
 			piece_outline_color;
-	sf::Color 
+	sf::Color
 			inbordered_color,
 			background_color,
 			text_color;

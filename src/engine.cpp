@@ -50,11 +50,9 @@ Evaluation Engine::dynamic_evaluate(Position const& b, int depth, AlphaBeta ab, 
 	}
 	if (depth == 0)
 		return static_evaluate(b);
-	if (evaluated[p].find(b) != evaluated[p].end() and
-		evaluated[p][b].second >= depth)
+	if (evaluated[p].find(b) != evaluated[p].end() and evaluated[p][b].second >= depth)
 		return evaluated[p][b].first;
-	if (depth == 1 and
-			b.is_capture_possible(MinMaxTag::side))
+	if (depth == 1 and b.is_capture_possible(MinMaxTag::side)) // capture renewal
 			depth++;
 
 	std::vector<Position> positions = MovesGenerator::generate_next_positions(b, MinMaxTag::side);

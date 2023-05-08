@@ -37,7 +37,7 @@ class CaptureTag {};
 
 /**************************************
 * traditionaly in chess programming   *
-* directions are called as in         * 
+* directions are called as in         *
 * compase rose                        *
 *               north(+8)             *
 *  north-west(+9) | north-east(+7)    *

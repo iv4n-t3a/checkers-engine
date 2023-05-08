@@ -121,7 +121,7 @@ template <typename M>
 inline void Gui::border_movable(Side p, M) {
 	drawer.unborder_all();
 	for (Square i = 0; i < 64; i++) {
-		if (not is_piece(i, p)) 
+		if (not is_piece(i, p))
 			continue;
 		if (is_movable(i, p, M()))
 			drawer.border(i);
@@ -133,7 +133,7 @@ inline bool Gui::is_movable(Square s, Side p, M) const {
 		return board.moves_at(s, p, M(), DiscTag());
 	else
 		return board.moves_at(s, p, M(), KingTag());
-		
+
 }
 inline bool Gui::is_piece(Square s, Side p) const {
 	return s != NONE_SQUARE and not board.is_empty(s) and board.side_at(s) == p;
