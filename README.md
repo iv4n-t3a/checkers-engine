@@ -16,8 +16,8 @@
 1. Установите g++, git, make и sfml
 2. Соберите проект
 
-	git clone https://github.com/iv4n-t3a/checkers
-	cd checkers
+	git clone https://github.com/iv4n-t3a/checkers-engine
+	cd checkers-engine
 	make
 
 [инструкция]:
