@@ -14,35 +14,35 @@
 
 
 class Drawer {
-	Position const& board;
-	sf::RenderWindow& window;
-	int square_size;
-	Bitboard bordered = 0;
-	Config cfg;
+  Position const& board;
+  sf::RenderWindow& window;
+  int square_size;
+  Bitboard bordered = 0;
+  Config cfg;
 public:
-	Drawer(sf::RenderWindow&, Position const&, Config c);
+  Drawer(sf::RenderWindow&, Position const&, Config c);
 
-	void border(Square);
-	void border(Bitboard);
-	void border_diff();
-	void border_captured();
-	void unborder_all();
+  void border(Square);
+  void border(Bitboard);
+  void border_diff();
+  void border_captured();
+  void unborder_all();
 
-	Square pick_square();
-	void redraw();
+  Square pick_square();
+  void redraw();
 private:
-	Square wait_mouse_click();
+  Square wait_mouse_click();
 
-	bool is_bordered(Square) const;
+  bool is_bordered(Square) const;
 
-	void draw_disc(Square, Side);
-	void draw_king(Square, Side);
-	void draw_border(Square);
-	void draw_white(Square);
-	void draw_black(Square);
+  void draw_disc(Square, Side);
+  void draw_king(Square, Side);
+  void draw_border(Square);
+  void draw_white(Square);
+  void draw_black(Square);
 
-	inline void fill_square(Square, sf::Color);
-	inline void draw_shape(Square, sf::Shape*);
+  inline void fill_square(Square, sf::Color);
+  inline void draw_shape(Square, sf::Shape*);
 };
 
 #endif // #ifndef DRAWER
