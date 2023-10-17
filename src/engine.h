@@ -1,16 +1,15 @@
 #ifndef ENGINE
 #define ENGINE
 
-#include <limits>
 #include <array>
-#include <vector>
+#include <limits>
 #include <tuple>
 #include <unordered_map>
+#include <vector>
 
-#include "types.h"
-#include "position.h"
 #include "evaluation.h"
-
+#include "position.h"
+#include "types.h"
 
 struct MaxTag;
 struct MinTag;
@@ -36,28 +35,32 @@ struct AlphaBeta {
   bool inline is_expectation_conflict();
 };
 
-
 class Engine {
   Position& board;
   std::array<std::unordered_map<Position, std::pair<Evaluation, int /*depth*/>, PositionHasher>, 2> evaluated;
-    int max_depth;
-public:
+  int max_depth;
+
+ public:
   Engine(Position&, int max_depth);
   void make_move(Side);
 
-private:
-  template <typename MinMaxTag> void make_move(Side s);
-  template <typename MinMaxTag> Evaluation dynamic_evaluate(Position const&, int depth, AlphaBeta, Side s);
+ private:
+  template <typename MinMaxTag>
+  void make_move(Side s);
+  template <typename MinMaxTag>
+  Evaluation dynamic_evaluate(Position const&, int depth, AlphaBeta, Side s);
 
   static Evaluation best_evaluation(Evaluation, Evaluation, MaxTag);
   static Evaluation best_evaluation(Evaluation, Evaluation, MinTag);
 
   static inline std::pair<Position, Evaluation> best_position(
-    std::pair<Position, Evaluation> const&, std::pair<Position, Evaluation> const&, MaxTag);
+      std::pair<Position, Evaluation> const&,
+      std::pair<Position, Evaluation> const&, MaxTag);
   static inline std::pair<Position, Evaluation> best_position(
-    std::pair<Position, Evaluation> const&, std::pair<Position, Evaluation> const&, MinTag);
+      std::pair<Position, Evaluation> const&,
+      std::pair<Position, Evaluation> const&, MinTag);
 
   static inline Evaluation static_evaluate(Position const&);
 };
 
-#endif // #ifndef ENGINE
+#endif  // #ifndef ENGINE

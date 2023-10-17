@@ -1,12 +1,11 @@
-#include <iostream>
-#include <array>
-#include <string>
-#include <SFML/Graphics.hpp>
-
-#include "types.h"
-
 #include "config.h"
 
+#include <SFML/Graphics.hpp>
+#include <array>
+#include <iostream>
+#include <string>
+
+#include "types.h"
 
 inline PlayerType player_type(char l) {
   if (l == 'h')
@@ -24,22 +23,11 @@ Config generate_default_config() {
   c.height = 800;
 
   c.etcdir = "/home/ivan/Projects/checkers/etc/";
-  c.square_color = {
-    sf::Color(238, 238, 210),
-    sf::Color(118, 150, 86)
-  };
-  c.piece_color = {
-    sf::Color(255, 255, 255),
-    sf::Color(0, 0, 0)
-  };
-  c.piece_outline_color = {
-    sf::Color(210, 105, 30),
-    sf::Color(255, 255, 255)
-  };
-  c.king_texture_path = {
-    c.etcdir+"white-king.png",
-    c.etcdir+"black-king.png"
-  };
+  c.square_color = {sf::Color(238, 238, 210), sf::Color(118, 150, 86)};
+  c.piece_color = {sf::Color(255, 255, 255), sf::Color(0, 0, 0)};
+  c.piece_outline_color = {sf::Color(210, 105, 30), sf::Color(255, 255, 255)};
+  c.king_texture_path = {c.etcdir + "white-king.png",
+                         c.etcdir + "black-king.png"};
   c.inbordered_color = sf::Color(186, 202, 68);
   c.background_color = sf::Color(33, 32, 47);
   c.text_color = sf::Color::Cyan;
@@ -51,8 +39,7 @@ Config generate_config(int argc, char *argv[]) {
   int i = 1;
 
   for (; i < argc; i++) {
-    if (argv[i][0] != '-')
-      break;
+    if (argv[i][0] != '-') break;
 
     std::string arg = argv[i];
     if (arg == "-d" or arg == "--depth")

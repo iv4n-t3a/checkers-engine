@@ -1,9 +1,8 @@
+#include "movegen.h"
+
 #include <vector>
 
 #include "position.h"
-
-#include "movegen.h"
-
 
 std::vector<Position> MovesGenerator::generate_next_positions(Position b, Side p) {
   b.init_move_cache();

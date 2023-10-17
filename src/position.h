@@ -1,38 +1,41 @@
 #ifndef POSITION
 #define POSITION
 
-#include <unordered_set>
 #include <stack>
+#include <unordered_set>
 #include <vector>
 
-#include "types.h"
 #include "bitboard.h"
-
+#include "types.h"
 
 struct KingsPosition {
   std::array<Bitboard, 2> kings;
-public:
+
+ public:
   KingsPosition(std::array<Bitboard, 2>);
   bool operator==(KingsPosition const& other) const;
 };
 
 class RepetitionHistory {
-protected:
+ protected:
   static constexpr MovesCount REPETITION_LIMIT = 3;
   std::vector<KingsPosition> repetition_history;
-public:
+
+ public:
   void push_reversible_move(KingsPosition);
   void push_irreversible_move(KingsPosition);
   bool is_draw() const;
-protected:
+
+ protected:
   MovesCount get_repetition_num() const;
 };
 
 class KingMovesCounter {
-protected:
+ protected:
   static constexpr MovesCount KING_MOVES_LIMIT = 30;
   MovesCount king_moves_count = 0;
-public:
+
+ public:
   void drop();
   void operator++();
   bool is_draw() const;
@@ -44,27 +47,29 @@ struct MoveCache {
 };
 
 class Position {
-public:
+ public:
   enum State {
     WHITE_WIN = WHITE,
     BLACK_WIN = BLACK,
     DRAW,
     PLAYING
   };
-protected:
+
+ protected:
   Bitboard all = 0;
   std::array<Bitboard, 2> allof, discsof, kingsof;
   static constexpr std::array<Bitboard, 2> upgradable = {
-    0xff00'0000'0000'0000, // WHITE
-    0x0000'0000'0000'00ff  // BLACK
+      0xff00'0000'0000'0000,  // WHITE
+      0x0000'0000'0000'00ff   // BLACK
   };
 
   KingMovesCounter king_moves_counter;
   RepetitionHistory repetition_history;
   MoveCache move_cache;
-public:
+
+ public:
   Position(Bitboard white_discs = 0x0000'0000'00aa'55aa,
-        Bitboard black_discs = 0x55aa'5500'0000'0000);
+           Bitboard black_discs = 0x55aa'5500'0000'0000);
 
   void init_move_cache();
   void pass(Side);
@@ -93,7 +98,8 @@ public:
   bool is_empty(Square) const;
   bool is_disc(Square, Side) const;
   Side side_at(Square) const;
-protected:
+
+ protected:
   inline void upgrade_if_nessary(Square, Side);
   inline void upgrade(Square, Side);
 
@@ -117,4 +123,4 @@ struct PositionHasher {
   }
 };
 
-#endif // #ifndef POSITION
+#endif  // #ifndef POSITION

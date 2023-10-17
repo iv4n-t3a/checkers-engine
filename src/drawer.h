@@ -1,17 +1,15 @@
 #ifndef DRAWER
 #define DRAWER
 
+#include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>
 #include <string>
 #include <tuple>
 
-#include <SFML/Window.hpp>
-#include <SFML/Graphics.hpp>
-
-#include "types.h"
-#include "position.h"
-#include "engine.h"
 #include "config.h"
-
+#include "engine.h"
+#include "position.h"
+#include "types.h"
 
 class Drawer {
   Position const& board;
@@ -19,7 +17,8 @@ class Drawer {
   int square_size;
   Bitboard bordered = 0;
   Config cfg;
-public:
+
+ public:
   Drawer(sf::RenderWindow&, Position const&, Config c);
 
   void border(Square);
@@ -30,7 +29,8 @@ public:
 
   Square pick_square();
   void redraw();
-private:
+
+ private:
   Square wait_mouse_click();
 
   bool is_bordered(Square) const;
@@ -45,4 +45,4 @@ private:
   inline void draw_shape(Square, sf::Shape*);
 };
 
-#endif // #ifndef DRAWER
+#endif  // #ifndef DRAWER

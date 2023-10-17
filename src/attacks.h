@@ -4,15 +4,14 @@
 #include <array>
 #include <iostream>
 
-#include "types.h"
 #include "bitboard.h"
+#include "types.h"
 
 constexpr std::array<Map, 4> init_xrays() {
   std::array<Map, 4> res;
   for (Square s = 0; s < 64; s++) {
     std::array<Bitboard, 4> bb;
-    for (int i = 0; i < 4; i++)
-      bb[i] = 1ull << s;
+    for (int i = 0; i < 4; i++) bb[i] = 1ull << s;
     for (int i = 0; i < 8; i++) {
       bb[0] |= NE_move(bb[0]);
       bb[1] |= NW_move(bb[1]);
@@ -24,8 +23,7 @@ constexpr std::array<Map, 4> init_xrays() {
       res[i][s] = bb[i];
     }
   }
-  for (int i = 0; i < 4; i++)
-    res[i][NONE_SQUARE] = 0;
+  for (int i = 0; i < 4; i++) res[i][NONE_SQUARE] = 0;
 
   return res;
 }
@@ -41,7 +39,7 @@ constexpr std::array<std::array<Direction, 64>, 64> init_directions() {
   std::array<std::array<Direction, 64>, 64> r;
   for (Square from = 0; from < 64; from++)
     for (Square to = 0; to < 64; to++) {
-      const int steps_count = abs(to%8 - from%8);
+      const int steps_count = abs(to % 8 - from % 8);
       if (steps_count != 0)
         r[from][to] = (Direction)((to - from) / steps_count);
     }
@@ -49,17 +47,18 @@ constexpr std::array<std::array<Direction, 64>, 64> init_directions() {
 }
 constexpr std::array<Map, 4> xrays = init_xrays();
 constexpr std::array<Map, 2> disc_moves = init_disc_moves();
-constexpr std::array<std::array<Direction, 64>, 64> directions = init_directions();
+constexpr std::array<std::array<Direction, 64>, 64> directions =
+    init_directions();
 
 inline Square get_xray_blocker(Bitboard blockers, Square s, int direction_num) {
   blockers &= xrays[direction_num][s];
-  if (blockers == 0)
-    return NONE_SQUARE;
-  return is_bsf_direction[direction_num] ? bsf(blockers): bsr(blockers);
+  if (blockers == 0) return NONE_SQUARE;
+  return is_bsf_direction[direction_num] ? bsf(blockers) : bsr(blockers);
 }
 inline Bitboard cut_xray(Bitboard blockers, Square s, int direction_num) {
   const Square blocker = get_xray_blocker(blockers, s, direction_num);
-  return xrays[direction_num][s] & ~xrays[direction_num][blocker] & ~(1ull << blocker);
+  return xrays[direction_num][s] & ~xrays[direction_num][blocker] &
+         ~(1ull << blocker);
 }
 
-#endif // #ifndef ATTACKS
+#endif  // #ifndef ATTACKS

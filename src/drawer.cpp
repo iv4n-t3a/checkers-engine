@@ -1,16 +1,15 @@
-#include <SFML/Window.hpp>
-#include <SFML/Graphics.hpp>
-
-#include "types.h"
-#include "bitboard.h"
-#include "position.h"
-
-#include "config.h"
-
 #include "drawer.h"
 
+#include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>
 
-Drawer::Drawer(sf::RenderWindow& w, Position const& b, Config c): window(w), board(b), cfg(c) {
+#include "bitboard.h"
+#include "config.h"
+#include "position.h"
+#include "types.h"
+
+Drawer::Drawer(sf::RenderWindow& w, Position const& b, Config c)
+    : window(w), board(b), cfg(c) {
   sf::Vector2u size = window.getSize();
   square_size = std::min(size.x, size.y) / 8;
   redraw();
@@ -30,9 +29,7 @@ void Drawer::border_diff() {
     bordered |= previous_all ^ board.get_all();
   previous_all = board.get_all();
 }
-void Drawer::border_captured() {
-  bordered |= board.get_captured();
-}
+void Drawer::border_captured() { bordered |= board.get_captured(); }
 void Drawer::unborder_all() {
   bordered = 0;
   redraw();
@@ -40,8 +37,7 @@ void Drawer::unborder_all() {
 
 Square Drawer::pick_square() {
   Square choice;
-  do
-    choice = wait_mouse_click();
+  do choice = wait_mouse_click();
   while (choice == NONE_SQUARE);
   unborder_all();
   border(choice);
@@ -58,13 +54,11 @@ void Drawer::redraw() {
     else
       draw_black(s);
 
-    if (is_bordered(s))
-      draw_border(s);
+    if (is_bordered(s)) draw_border(s);
   }
 
   for (Square s = 0; s < 64; s++) {
-    if (board.is_empty(s))
-      continue;
+    if (board.is_empty(s)) continue;
 
     Side p = board.side_at(s);
     if (board.is_disc(s, p))
@@ -82,21 +76,17 @@ Square Drawer::wait_mouse_click() {
       window.close();
       exit(0);
     }
-    if (event.type != sf::Event::MouseButtonPressed)
-      continue;
+    if (event.type != sf::Event::MouseButtonPressed) continue;
 
-    int x = event.mouseButton.x,
-      y = event.mouseButton.y;
-    if (x >= square_size*8 or y >= square_size*8)
-      return NONE_SQUARE;
-    return 63 - x/square_size - 8*(y/square_size);
+    int x = event.mouseButton.x, y = event.mouseButton.y;
+    if (x >= square_size * 8 or y >= square_size * 8) return NONE_SQUARE;
+    return 63 - x / square_size - 8 * (y / square_size);
   }
   return NONE_SQUARE;
 }
 
 bool Drawer::is_bordered(Square s) const {
-  if (s == NONE_SQUARE)
-    return false;
+  if (s == NONE_SQUARE) return false;
   return getbit(bordered, s);
 }
 
@@ -115,15 +105,9 @@ void Drawer::draw_king(Square s, Side p) {
   king.setTexture(texture);
   draw_shape(s, &king);
 }
-void Drawer::draw_border(Square s) {
-  fill_square(s, cfg.inbordered_color);
-}
-void Drawer::draw_white(Square s) {
-  fill_square(s, cfg.square_color[WHITE]);
-}
-void Drawer::draw_black(Square s) {
-  fill_square(s, cfg.square_color[BLACK]);
-}
+void Drawer::draw_border(Square s) { fill_square(s, cfg.inbordered_color); }
+void Drawer::draw_white(Square s) { fill_square(s, cfg.square_color[WHITE]); }
+void Drawer::draw_black(Square s) { fill_square(s, cfg.square_color[BLACK]); }
 
 inline void Drawer::fill_square(Square s, sf::Color c) {
   sf::RectangleShape r(sf::Vector2f(square_size, square_size));
@@ -132,6 +116,6 @@ inline void Drawer::fill_square(Square s, sf::Color c) {
 }
 inline void Drawer::draw_shape(Square s, sf::Shape* shape) {
   s = 63 - s;
-  shape->setPosition(s%8 * square_size, s/8 * square_size);
+  shape->setPosition(s % 8 * square_size, s / 8 * square_size);
   window.draw(*shape);
 }

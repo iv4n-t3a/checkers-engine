@@ -1,15 +1,13 @@
-#include <string>
-
-#include "types.h"
-#include "position.h"
-#include "engine.h"
-#include "drawer.h"
-
 #include "gui.h"
 
+#include <string>
 
-Gui::Gui(Position& b, Engine& c, Drawer& d): board(b), bot(c), drawer(d) {
-}
+#include "drawer.h"
+#include "engine.h"
+#include "position.h"
+#include "types.h"
+
+Gui::Gui(Position& b, Engine& c, Drawer& d) : board(b), bot(c), drawer(d) {}
 
 void Gui::bot_move(Side p) {
   exit_if_end(p);
@@ -36,8 +34,7 @@ void Gui::human_move(Side p) {
 template <typename M>
 void Gui::pick_move(Side p, M) {
   Square s;
-  do
-    s = drawer.pick_square();
+  do s = drawer.pick_square();
   while (s == NONE_SQUARE);
 
   pick_move(s, p, M());
@@ -84,8 +81,7 @@ inline void Gui::make_move(Square from, Square to, Side p, NoncaptureTag, P) {
 template <typename P>
 inline void Gui::make_move(Square from, Square to, Side p, CaptureTag, P) {
   board.move(from, to, p, CaptureTag(), P());
-  if (board.moves_at(to, p, CaptureTag(), P()))
-    finish_capture(to, p);
+  if (board.moves_at(to, p, CaptureTag(), P())) finish_capture(to, p);
 }
 
 void Gui::finish_capture(Square s, Side p) {
@@ -121,10 +117,8 @@ template <typename M>
 inline void Gui::border_movable(Side p, M) {
   drawer.unborder_all();
   for (Square i = 0; i < 64; i++) {
-    if (not is_piece(i, p))
-      continue;
-    if (is_movable(i, p, M()))
-      drawer.border(i);
+    if (not is_piece(i, p)) continue;
+    if (is_movable(i, p, M())) drawer.border(i);
   }
 }
 template <typename M>
@@ -133,7 +127,6 @@ inline bool Gui::is_movable(Square s, Side p, M) const {
     return board.moves_at(s, p, M(), DiscTag());
   else
     return board.moves_at(s, p, M(), KingTag());
-
 }
 inline bool Gui::is_piece(Square s, Side p) const {
   return s != NONE_SQUARE and not board.is_empty(s) and board.side_at(s) == p;
@@ -141,22 +134,23 @@ inline bool Gui::is_piece(Square s, Side p) const {
 
 inline void Gui::exit_if_end(Side p) {
   switch (board.get_state(p)) {
-    case Position::WHITE_WIN: display_win_of_white(); break;
-    case Position::BLACK_WIN: display_win_of_black(); break;
-    case Position::DRAW: display_draw(); break;
-    case Position::PLAYING: return;
+    case Position::WHITE_WIN:
+      display_win_of_white();
+      break;
+    case Position::BLACK_WIN:
+      display_win_of_black();
+      break;
+    case Position::DRAW:
+      display_draw();
+      break;
+    case Position::PLAYING:
+      return;
   }
 }
 
-inline void Gui::display_win_of_white() {
-  exit("White win!");
-}
-inline void Gui::display_win_of_black() {
-  exit("Black win!");
-}
-inline void Gui::display_draw() {
-  exit("Draw!");
-}
+inline void Gui::display_win_of_white() { exit("White win!"); }
+inline void Gui::display_win_of_black() { exit("Black win!"); }
+inline void Gui::display_draw() { exit("Draw!"); }
 
 inline void Gui::exit(std::string message) {
   drawer.redraw();

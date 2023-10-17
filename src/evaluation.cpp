@@ -1,10 +1,9 @@
-#include <array>
-
-#include "position.h"
-#include "bitboard.h"
-
 #include "evaluation.h"
 
+#include <array>
+
+#include "bitboard.h"
+#include "position.h"
 
 constexpr Evaluation material_k = 10000;
 constexpr Evaluation lines_k = 1;
@@ -34,59 +33,46 @@ Evaluation evaluate(Position const& b) {
 }
 
 inline Evaluation material(Position const& b) {
-  return
-    (bb_popcount(b.get_discs(WHITE)) - bb_popcount(b.get_discs(BLACK))) +
-    (bb_popcount(b.get_kings(WHITE)) - bb_popcount(b.get_kings(BLACK))) * 5;
+  return (bb_popcount(b.get_discs(WHITE)) - bb_popcount(b.get_discs(BLACK))) +
+         (bb_popcount(b.get_kings(WHITE)) - bb_popcount(b.get_kings(BLACK))) *
+             5;
 }
 
 inline Evaluation lines(Position const& b) {
   return
-      (bb_popcount(b.get_discs(WHITE) & 0x00ff'0000'0000'0000) - bb_popcount(b.get_discs(BLACK) & 0x0000'0000'0000'ff00)) * 3
-    + (bb_popcount(b.get_discs(WHITE) & 0x0000'ff00'0000'0000) - bb_popcount(b.get_discs(BLACK) & 0x0000'003c'00ff'0000)) * 2
-    + (bb_popcount(b.get_discs(WHITE) & 0x0000'00ff'0000'0000) - bb_popcount(b.get_discs(BLACK) & 0x0000'0000'ff00'0000)) * 1
-//    + (bb_popcount(b.get_discs(WHITE) & 0x0000'0000'ff00'0000) - bb_popcount(b.get_discs(BLACK) & 0x0000'00ff'0000'0000)) * 0
-    - (bb_popcount(b.get_discs(WHITE) & 0x0000'0000'00ff'0000) - bb_popcount(b.get_discs(BLACK) & 0x0000'ff00'0000'0000)) * 1
-    - (bb_popcount(b.get_discs(WHITE) & 0x0000'0000'0000'ff00) - bb_popcount(b.get_discs(BLACK) & 0x00ff'0000'0000'0000)) * 2
-    - (bb_popcount(b.get_discs(WHITE) & 0x0000'0000'0000'00ff) - bb_popcount(b.get_discs(BLACK) & 0xff00'0000'0000'0000)) * 3;
+           (bb_popcount(b.get_discs(WHITE) & 0x00ff'0000'0000'0000) - bb_popcount(b.get_discs(BLACK) & 0x0000'0000'0000'ff00)) * 3
+         + (bb_popcount(b.get_discs(WHITE) & 0x0000'ff00'0000'0000) - bb_popcount(b.get_discs(BLACK) & 0x0000'003c'00ff'0000)) * 2
+         + (bb_popcount(b.get_discs(WHITE) & 0x0000'00ff'0000'0000) - bb_popcount(b.get_discs(BLACK) & 0x0000'0000'ff00'0000)) * 1
+      // + (bb_popcount(b.get_discs(WHITE) & 0x0000'0000'ff00'0000) - bb_popcount(b.get_discs(BLACK) & 0x0000'00ff'0000'0000)) * 0
+         - (bb_popcount(b.get_discs(WHITE) & 0x0000'0000'00ff'0000) - bb_popcount(b.get_discs(BLACK) & 0x0000'ff00'0000'0000)) * 1
+         - (bb_popcount(b.get_discs(WHITE) & 0x0000'0000'0000'ff00) - bb_popcount(b.get_discs(BLACK) & 0x00ff'0000'0000'0000)) * 2
+         - (bb_popcount(b.get_discs(WHITE) & 0x0000'0000'0000'00ff) - bb_popcount(b.get_discs(BLACK) & 0xff00'0000'0000'0000)) * 3;
 }
 
 inline Evaluation mobility(Position const& b) {
-  return
-      bb_popcount(NE_move(b.get_discs(WHITE)) & ~b.get_all())
-    + bb_popcount(NW_move(b.get_discs(WHITE)) & ~b.get_all())
-    - bb_popcount(SE_move(b.get_discs(BLACK)) & ~b.get_all())
-    - bb_popcount(SW_move(b.get_discs(BLACK)) & ~b.get_all());
+  return bb_popcount(NE_move(b.get_discs(WHITE)) & ~b.get_all()) +
+         bb_popcount(NW_move(b.get_discs(WHITE)) & ~b.get_all()) -
+         bb_popcount(SE_move(b.get_discs(BLACK)) & ~b.get_all()) -
+         bb_popcount(SW_move(b.get_discs(BLACK)) & ~b.get_all());
 }
 
 inline Evaluation connected_discs(Position const& b) {
   Bitboard extreme_white = b.get_discs(WHITE) & 0x8181'8181'8181'8181;
   Bitboard extreme_black = b.get_discs(BLACK) & 0x8181'8181'8181'8181;
-  return
-    bb_popcount(
-      ((NE_move(b.get_discs(WHITE)) & b.get_discs(WHITE)) >> NORTH_EAST) &
-      ((NW_move(b.get_discs(WHITE)) & b.get_discs(WHITE)) >> NORTH_WEST)
-    ) - bb_popcount(
-      ((SE_move(b.get_discs(BLACK)) & b.get_discs(BLACK)) << -SOUTH_EAST) &
-      ((SW_move(b.get_discs(BLACK)) & b.get_discs(BLACK)) << -SOUTH_WEST)
-    ) + bb_popcount(
-      (NE_move(extreme_white) & b.get_discs(WHITE)) |
-      (NW_move(extreme_white) & b.get_discs(WHITE))
-    ) - bb_popcount(
-      (NE_move(extreme_black) & b.get_discs(WHITE)) |
-      (NW_move(extreme_black) & b.get_discs(WHITE))
-    );
+  return bb_popcount(((NE_move(b.get_discs(WHITE)) & b.get_discs(WHITE)) >>  NORTH_EAST) & ((NW_move(b.get_discs(WHITE)) & b.get_discs(WHITE)) >>  NORTH_WEST)) -
+         bb_popcount(((SE_move(b.get_discs(BLACK)) & b.get_discs(BLACK)) << -SOUTH_EAST) & ((SW_move(b.get_discs(BLACK)) & b.get_discs(BLACK)) << -SOUTH_WEST)) +
+         bb_popcount((NE_move(extreme_white) & b.get_discs(WHITE)) | (NW_move(extreme_white) & b.get_discs(WHITE))) -
+         bb_popcount((NE_move(extreme_black) & b.get_discs(WHITE)) | (NW_move(extreme_black) & b.get_discs(WHITE)));
 }
 
 inline Evaluation extreme_discs(Position const& b) {
-  return
-    bb_popcount(b.get_discs(WHITE) & 0x8181'8181'8181'8181) -
-    bb_popcount(b.get_discs(BLACK) & 0x8181'8181'8181'8181);
+  return bb_popcount(b.get_discs(WHITE) & 0x8181'8181'8181'8181) -
+         bb_popcount(b.get_discs(BLACK) & 0x8181'8181'8181'8181);
 }
 
 inline Evaluation gold_discs(Position const& b) {
-  return
-    bb_popcount(b.get_discs(WHITE) & 0x0000'0000'0018'1818) -
-    bb_popcount(b.get_discs(BLACK) & 0x1818'1800'0000'0000);
+  return bb_popcount(b.get_discs(WHITE) & 0x0000'0000'0018'1818) -
+         bb_popcount(b.get_discs(BLACK) & 0x1818'1800'0000'0000);
 }
 
 constexpr std::array<std::array<Bitboard, 64>, 2> init_passed_discs_masks() {
@@ -104,7 +90,8 @@ constexpr std::array<std::array<Bitboard, 64>, 2> init_passed_discs_masks() {
   }
   return result;
 }
-constexpr std::array<std::array<Bitboard, 64>, 2> passed_discs_masks = init_passed_discs_masks();
+constexpr std::array<std::array<Bitboard, 64>, 2> passed_discs_masks =
+    init_passed_discs_masks();
 
 inline Evaluation passed_discs(Position const& b) {
   Evaluation count = 0;
