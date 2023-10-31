@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=checkers
+Comment=Try to win me!
+Exec=checkers
+Terminal=false
+Type=Application
+Icon=/etc/checkers/icon.png
+Categories=Game

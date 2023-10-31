@@ -22,7 +22,7 @@ Config generate_default_config() {
   c.wight = 600;
   c.height = 800;
 
-  c.etcdir = "/home/ivan/Projects/checkers/etc/";
+  c.etcdir = "/etc/checkers/";
   c.square_color = {sf::Color(238, 238, 210), sf::Color(118, 150, 86)};
   c.piece_color = {sf::Color(255, 255, 255), sf::Color(0, 0, 0)};
   c.piece_outline_color = {sf::Color(210, 105, 30), sf::Color(255, 255, 255)};
@@ -34,7 +34,7 @@ Config generate_default_config() {
 
   return c;
 }
-Config generate_config(int argc, char *argv[]) {
+Config generate_config(int argc, char* argv[]) {
   Config c = generate_default_config();
   int i = 1;
 

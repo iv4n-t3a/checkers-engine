@@ -11,21 +11,25 @@
 ## Демо:
 
 [сборка]:
-## Сборка проекта:
+## Установка проекта:
 
-1. Установите g++, git, make и sfml
-2. Соберите проект
+1. Установите `g++`, `git`, `make` и `sfml`
+2. Установка
 
 	git clone https://github.com/iv4n-t3a/checkers-engine
 	cd checkers-engine
-	make
+	sudo make install
+
+## Деустановка:
+
+	sudo make uninstall
 
 [инструкция]:
-## Как пользоватся
+## Как пользоватся:
 
 Вывод справки
 
-	./checkers --help
+	checkers --help
 
 [как работает]:
 ## Как работает:
@@ -43,14 +47,14 @@
 Такая модель хранения позиции позволяет быстро делать операции над группами шашек.
 Например так можно сгенерировать взятия в одном из направлений
 
-[white](img/bitboard-demo/white.png "white")
-[black](img/bitboard-demo/black.png "black")
-[all](img/bitboard-demo/all.png "all = white | black")
-[empty](img/bitboard-demo/empty.png "empty = ~all")
-[white-moved](img/bitboard-demo/white-moved.png "white_moved = white << 7")
-[white-selected](img/bitboard-demo/white-selected.png "white_selected = white_moved & black")
-[white-moved](img/bitboard-demo/subfinal-attackers.png "white_moved = white_selected << 7")
-[white-selected](img/bitboard-demo/white-finished.png "white_selected = white_moved & empty")
+![white](img/bitboard-demo/white.png "white")
+![black](img/bitboard-demo/black.png "black")
+![all](img/bitboard-demo/all.png "all = white | black")
+![empty](img/bitboard-demo/empty.png "empty = ~all")
+![white-moved](img/bitboard-demo/white-moved.png "white_moved = white << 7")
+![white-selected](img/bitboard-demo/white-selected.png "white_selected = white_moved & black")
+![white-moved](img/bitboard-demo/subfinal-attackers.png "white_moved = white_selected << 7")
+![white-selected](img/bitboard-demo/white-finished.png "white_selected = white_moved & empty")
 
 В данном примере взятие в этом направлении может выполнить только одна шашка
 
@@ -60,7 +64,7 @@
 Каждой позиции присваивается числовая оценка, которую в ходе игры один игрок старается увеличить, а второй уменьшить
 Идея алгоритма в том, что мы поочередно перебираем все ходы руководствуясь тем, что каждый раз игрок, чья очередь выберет оптимальный для себя ход
 
-[](img/search-demo/minmax.png)
+![](img/search-demo/minmax.png)
 
 Этот поиск можно оптимизировать альфа-бета отсечением.
 В его основе лежит идея, что оценивание ветви дерева поиска может быть досрочно прекращено
@@ -69,7 +73,7 @@
 Альфа-бета-отсечение является оптимизацией, так как не влияет на корректность работы алгоритма.
 (Объяснение из википедии)
 
-[](img/search-demo/alpha-beta.png)
+![](img/search-demo/alpha-beta.png)
 
 Одной из проблем минимаксного поиска являются случаи, когда максимальная его глубина достигается перед проигрышем,
 но, так как анализ не дошел до проигрыша, позиция кажется выигрышной.
@@ -86,16 +90,16 @@
 
 Более выгодные расположения шашек в дебюте
 
-[](img/evaluation-demo/opening.png)
+![](img/evaluation-demo/opening.png)
 
 в мительшпиле(середине игры)
 
-[](img/evaluation-demo/midlegame.png)
+![](img/evaluation-demo/midlegame.png)
 
 в окончании
 
-[](img/evaluation-demo/endgame.png)
+![](img/evaluation-demo/endgame.png)
 
 проходная шашка
 
-[](img/evaluation-demo/passed-disc.png)
+![](img/evaluation-demo/passed-disc.png)
