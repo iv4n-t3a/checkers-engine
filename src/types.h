@@ -2,9 +2,8 @@
 #define TYPES
 
 #include <iostream>
+#include <cstdint>
 #include <array>
-
-
 
 typedef uint64_t Bitboard;
 typedef uint8_t Square;
